@@ -1,27 +1,3 @@
-Skip to content
- 
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@mretcoy08 
-hijax231
-/
-NEWTAX
-Private
-1
-0 1
- Code  Issues 0  Pull requests 0  Actions  Projects 0  Security  Insights
-NEWTAX/assets/js/inputmask.js  / 
-@hijax231 hijax231 newsetuplinux
-42ede90 on Nov 12, 2019
-Executable File  604 lines (532 sloc)  23.2 KB
-    
-You're using code navigation to jump to definitions or references.
-Learn more or give us feedback
 /**
  * jquery.mask.js
  * @version: v1.14.15
@@ -626,15 +602,3 @@ Learn more or give us feedback
         }
     }, globals.watchInterval);
 }, window.jQuery, window.Zepto));
-© 2020 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About

@@ -78,6 +78,8 @@ $(document).ready(function () {
         else{
              change = moneyToNum($("#cash_change").val()) > 0 ? $("#cash_change").val(): 0 ;
         }
+        due_discount = $('#due_discount').val();
+        due_penalty = $('#due_penalty').val();
         or_number = $("#or_number").val();
         or_date = $("#or_date").val();
         cash_rec = getcash;
@@ -88,6 +90,7 @@ $(document).ready(function () {
         due_total = $('#due_total').val();
         balance = $("#balance").val();
         tax_year = $("#tax_year").val();
+        var mode_of_payment = $("#mode_of_payment");
         check_rec = total_cheque;
       var payment_method = $('#payment_method').val();
       var payment_id = $("#payment_id").val();
@@ -95,12 +98,12 @@ $(document).ready(function () {
       switch(payment_method)
       {
         case "cash":
-            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
 
         break;
 
         case "check":
-            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
             $('#cash_payment').attr("hidden",true);
             for(var i = 0; i< add_line.length;i++)
             {
@@ -108,7 +111,7 @@ $(document).ready(function () {
                 $.ajax({
                     type: "POST",
                     data: add_line[i],
-                    url: global.settings.url +'Compromise/compromise_check',
+                    url: global.settings.url +'Payment/payment_check',
                     
                     success: function(res){
                         console.log(res);
@@ -122,13 +125,13 @@ $(document).ready(function () {
         break;
 
         case "cashandcheck":
-            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
                 for(var i = 0; i< add_line.length;i++)
             { 
                 $.ajax({
                     type: "POST",
                     data: add_line[i],
-                    url: global.settings.url +'Compromise/compromise_check',
+                    url: global.settings.url +'Payment/payment_check',
                     
                     success: function(res){
                 
@@ -146,12 +149,12 @@ $(document).ready(function () {
      
   });
 
-  function paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year)
+  function paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty)
   {
     $.ajax({
         type : 'POST',
-        url : global.settings.url + 'Compromise/compromise_cash',
-        data: {mode_of_payment:mode_of_payment,tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,first_name:first_name,middle_name:middle_name,last_name:last_name},
+        url : global.settings.url + 'Payment/payment_cash',
+        data: {mode_of_payment:mode_of_payment,due_penalty:due_penalty,due_discount:due_discount,tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,first_name:first_name,middle_name:middle_name,last_name:last_name},
         dataType:"json",
         success : function(data){
             console.table(data);
@@ -338,7 +341,7 @@ function cancelOR(value){
       console.log(id);
       $(".owners").remove();
       $("#addPayment").modal("show");
-     
+    
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Payment/payment_compute',

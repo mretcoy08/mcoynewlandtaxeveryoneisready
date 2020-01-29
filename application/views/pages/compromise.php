@@ -1,4 +1,10 @@
 <div class="content">
+
+
+
+<div class="container">
+
+</div>
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -285,7 +291,7 @@
             <div class="col-sm-4 paymentcash change">
                 <div class="form-group">
                     <label for="bmb-label-floating">Change:</label>
-                    <input type="text" class = "form-control payment payment_decimal" name = "cash_change" id = "cash_change" readonly step =".01">
+                    <input type="text" class = "form-control payment payment_decimal money2" name = "cash_change" id = "cash_change" readonly step =".01">
                 </div>
             </div>
 
@@ -373,7 +379,7 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label class = "bmd-label-floating">Cheque Amount</label>
-                            <input type="number" class="form-control payment payment_decimal check_pay" name="cheque_amount" id="cheque_amount">
+                            <input type="text" class="form-control payment payment_decimal check_pay money2" name="cheque_amount" id="cheque_amount">
                         </div> 
                     </div> 
                     <div class="col-sm-4">
@@ -388,6 +394,8 @@
                 </div>
 
                     
+
+
 
                 <div class="col-sm-12">
                     <table class="table table-bordered" id = "table_cheque">
@@ -420,7 +428,7 @@
         
      
         
-      <input type="text" name = "idd" id = "idd">   
+      <input type="hidden" name = "idd" id = "idd">   
          <!-- Modal footer -->
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary" id = "paymentbtn">Submit</button>

@@ -282,7 +282,7 @@ class Main_model extends CI_Model{
 						->update($table,$data);
 
 		if($query){
-			return 'success';
+			return $query;
 		}
 	}
 //END OF UPDATE

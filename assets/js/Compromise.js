@@ -1,4 +1,25 @@
 var dataTable
+var add_line = [];
+var row_num = 0;
+var row_id = 0;
+var total_cheque = 0;
+
+var check_bank = [];
+var check_number = [];
+var check_amount = [];
+var check_date = [];
+
+var or_number;
+var or_date;
+var first_name;
+var middle_name;
+var last_name;
+var cash_rec;
+var total_rec;
+var due_total;
+var balance;
+var check_rec;
+var tax_year;
 
 $(document).ready(function(){
 
@@ -30,6 +51,7 @@ $(document).ready(function () {
            ]    
     });
   });
+
 
 
   function compromise(val)
@@ -96,8 +118,7 @@ $(document).ready(function () {
       else{
            change = moneyToNum($("#cash_change").val()) > 0 ? $("#cash_change").val(): 0 ;
       }
-      due_discount = $('#due_discount').val();
-      due_penalty = $('#due_penalty').val();
+      
       or_number = $("#or_number").val();
       or_date = $("#or_date").val();
       cash_rec = getcash;
@@ -110,17 +131,17 @@ $(document).ready(function () {
       tax_year = $("#tax_year").val();
       check_rec = total_cheque;
     var payment_method = $('#payment_method').val();
-    var payment_id = $("#payment_id").val();
+    var payment_id = $("#idd").val();
 
     switch(payment_method)
     {
       case "cash":
-          paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+          paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
 
       break;
 
       case "check":
-          paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+          paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
           $('#cash_payment').attr("hidden",true);
           for(var i = 0; i< add_line.length;i++)
           {
@@ -128,7 +149,7 @@ $(document).ready(function () {
               $.ajax({
                   type: "POST",
                   data: add_line[i],
-                  url: global.settings.url +'Payment/payment_check',
+                  url: global.settings.url +'Compromise/compromise_check',
                   
                   success: function(res){
                       console.log(res);
@@ -142,13 +163,13 @@ $(document).ready(function () {
       break;
 
       case "cashandcheck":
-          paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+          paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
               for(var i = 0; i< add_line.length;i++)
           { 
               $.ajax({
                   type: "POST",
                   data: add_line[i],
-                  url: global.settings.url +'Payment/payment_check',
+                  url: global.settings.url +'Compromise/compromise_check',
                   
                   success: function(res){
               
@@ -166,19 +187,19 @@ $(document).ready(function () {
    
 });
 
-function paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty)
+function paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year)
 {
   $.ajax({
       type : 'POST',
-      url : global.settings.url + 'Payment/payment_cash',
-      data: {due_penalty:due_penalty,due_discount:due_discount,tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,first_name:first_name,middle_name:middle_name,last_name:last_name},
+      url : global.settings.url + 'Compromise/compromise_cash',
+      data: {tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,first_name:first_name,middle_name:middle_name,last_name:last_name},
       dataType:"json",
       success : function(data){
           console.table(data);
           paymentHide(); 
           reset();
           $(".owners").remove();
-          $("#addPayment").modal("hide");
+          $("#addCompromisePayment").modal("hide");
           dataTable.ajax.reload();
           Swal.fire(
               'PAYMENT Successful!',
@@ -188,6 +209,101 @@ function paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,midd
       },
   });
 }
+
+
+$("#add_cheque").click(function(e){
+    e.preventDefault();
+
+    var or_num = $("#or_number").val();
+    or_num = or_num.replace(/\s/g, '')
+    
+
+
+    if(or_num == ""){
+         
+        Swal.fire("You cannot add check without OR number!");
+    }
+    else if(or_num){
+
+                if (row_num >= 3) {
+            
+                } 
+                else {
+                // table_cheque.row.add([
+                //   cheq_number,
+                //   cheq_amount,
+                //   bank_branch,
+                //   '<button type="button" class="btn btn-danger" id="Delete-btn">Delete</button> '
+                // ]).draw(false);
+            
+                    add_line.push({
+                        'ch[bank]' : $('#bank').val(),
+                        'ch[check_number]' : $('#cheque_no').val(),
+                        'ch[check_amount]' : $('#cheque_amount').val(),
+                        'ch[check_date]' :  $('#cheque_date').val(),
+                        'ch[or_number]' :  $("#or_number").val()
+
+                    });
+                   
+                    total_cheque += parseFloat($("#cheque_amount").val()); 
+                
+                    var table = document.getElementById("table_cheque");
+                    var row= document.createElement("tr");
+                    row.setAttribute('id','row'+row_id);
+                    row.setAttribute('class','rowrow');
+                    var td1 = document.createElement("td");
+                    var td2 = document.createElement("td");
+                    var td3 = document.createElement("td");
+                    var td4 = document.createElement("td");
+                    var td5 = document.createElement("td");
+                    td1.innerHTML = document.getElementById("bank").value;
+                    td2.innerHTML  = document.getElementById("cheque_no").value;
+                    td3.innerHTML  = document.getElementById("cheque_amount").value;
+                    td4.innerHTML  = document.getElementById("cheque_date").value;
+                    td5.innerHTML  = '<button type="button" class="btn_delete btn btn-danger cor_del" id="'+row_id+'">Delete</button>';
+                    row.appendChild(td1);
+                    row.appendChild(td2);
+                    row.appendChild(td3);
+                    row.appendChild(td4);
+                    row.appendChild(td5);
+                    table.children[0].appendChild(row);
+                    row_id++;
+                    row_num++;
+
+                    $(".check_pay").val("");
+            
+                }
+
+                console.log(add_line);
+                console.log(total_cheque);
+
+
+    }
+   
+
+  });
+
+
+
+
+  $(document).on('click', '.btn_delete', function(){
+
+    var a = $(this).attr("id");
+    total_cheque -= parseFloat(add_line[a]["ch[check_amount]"]);
+    console.log(total_cheque);
+    row_num--;
+    delete add_line[a];
+    $('#row'+a+'').remove(); 
+
+  });
+
+
+$("#cash_payment").click(function(){
+     
+    $("#cash_payment").val("");
+ 
+});
+
 
   $("#payment_method").change(function(){
     console.log($(this).val());

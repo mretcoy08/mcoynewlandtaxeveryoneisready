@@ -28,11 +28,16 @@ class Payment extends CI_Controller {
 		$payment_method = clean_data(post("payment_method"));
 	
 		// action('HomeController@getIndex', $params);
-		
+		$orData = [
+			"or_number" => clean_data(post("or_number")),
+			 "or_date" => clean_data(post("or_date")),
+		];
+
+		$query = $this->Main_model->insertWithId("or_pool",$orData);
+
+
 		$getData = [
 			 "payor_name" => ucwords(clean_data(post("first_name")))." ".ucwords(clean_data(post("middle_name"))).' '.ucwords(clean_data(post("last_name"))),
-			 "or_number" => clean_data(post("or_number")),
-			 "or_date" => clean_data(post("or_date")),
 			 "cash_rec" => saveMoney(clean_data(post("cash_rec"))),
 			 "check_rec" => saveMoney(clean_data(post("check_rec"))),
 			 "total_rec" => saveMoney(clean_data(post("total_rec"))),
@@ -41,6 +46,7 @@ class Payment extends CI_Controller {
 			 "due_discount" => saveMoney(clean_data(post("due_discount"))),
 			 "tax_year" => clean_data(post("tax_year")),
 			 "payment_status" => "PAID",
+			 "or_pool_id" => $query,
 		];
 		$where = [
 			"id" => clean_data(post("payment_id")),
