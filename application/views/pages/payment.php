@@ -370,7 +370,7 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label class = "bmd-label-floating">Cheque Amount</label>
-                            <input type="number" class="form-control payment payment_decimal check_pay" name="cheque_amount" id="cheque_amount">
+                            <input type="text" class="form-control payment payment_decimal check_pay money2" name="cheque_amount" id="cheque_amount">
                         </div> 
                     </div> 
                     <div class="col-sm-4">
@@ -775,7 +775,7 @@
                                 
                                 <!-- Modal footer -->
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary" id = "addbtn">Submit</button>
+                                <button type="submit" class="btn btn-primary" id = "changebutton">Submit</button>
                             </div>
                                 </form>
                         </div>

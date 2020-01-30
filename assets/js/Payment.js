@@ -60,16 +60,17 @@ $(document).ready(function () {
     });
   });
 
+
+
   $("#paymentbtn").click(function(e){
       e.preventDefault();
+     
       add_line = add_line.filter(function(el){
         return el != null;
       });  
 
       //ERROR ON PAYMENT GETCASH BALANCE. QUESTION FOR CHANGE?? 
         var getcash = $("#cash_payment").val() == null ? 0 : $("#cash_payment").val();
-        console.log("cash" +getcash);
-        console.log("check" +total_cheque);
         var change
         if($("#cash_change").val() == 0.00)
         {
@@ -90,20 +91,20 @@ $(document).ready(function () {
         due_total = $('#due_total').val();
         balance = $("#balance").val();
         tax_year = $("#tax_year").val();
-        var mode_of_payment = $("#mode_of_payment");
+        var mode_of_payment = $("#mode_of_payment").val();
         check_rec = total_cheque;
-      var payment_method = $('#payment_method').val();
-      var payment_id = $("#payment_id").val();
-
+      var payment_id = $("#idd").val();
+        var payment_method = $('#payment_method').val();
+        console.log(payment_method);
       switch(payment_method)
       {
         case "cash":
-            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
 
         break;
 
         case "check":
-            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
             $('#cash_payment').attr("hidden",true);
             for(var i = 0; i< add_line.length;i++)
             {
@@ -122,10 +123,11 @@ $(document).ready(function () {
                 });
 
             }
+          
         break;
 
         case "cashandcheck":
-            paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
                 for(var i = 0; i< add_line.length;i++)
             { 
                 $.ajax({
@@ -142,19 +144,22 @@ $(document).ready(function () {
                 });
 
             }
+         
         break;
       }
+
     
      
      
   });
-
-  function paymentX(mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty)
+  function paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty)
   {
+    
+        console.log(payment_method);
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Payment/payment_cash',
-        data: {mode_of_payment:mode_of_payment,due_penalty:due_penalty,due_discount:due_discount,tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,first_name:first_name,middle_name:middle_name,last_name:last_name},
+        data: {payment_method:payment_method,mode_of_payment:mode_of_payment,due_penalty:due_penalty,due_discount:due_discount,tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,first_name:first_name,middle_name:middle_name,last_name:last_name},
         dataType:"json",
         success : function(data){
             console.table(data);
@@ -353,7 +358,7 @@ function cancelOR(value){
            console.table(landAndOwner);
             console.table(payment);
             var html_owner = "";
-            $("#idd").val(data.land_faas_id);
+           
 
             $("#pin").val(landAndOwner[0].pin);
             $("#arp").val(landAndOwner[0].tax_dec_no);
@@ -370,7 +375,7 @@ function cancelOR(value){
             $("#balance").val(money(payment.balance));
 
             
-            $("#payment_id").val(payment.payment_id);
+            $("#idd").val(payment.id);
             
 
             
@@ -388,73 +393,20 @@ function cancelOR(value){
   }
 
 
-  function compromise(val)
-  {
-    paymentHide(); 
-    reset();
-      var id = val;
-      console.log(id);
-      $(".owners").remove();
-      $("#addPayment").modal("show");
-      $(".monthly_payment").show();
-    $.ajax({
-        type : 'POST',
-        url : global.settings.url + 'Payment/compromise_compute',
-        data:{id: id},
-        dataType:"json",
-        success : function(data){
-            var landAndOwner = data.landAndOwner;
-            var payment = data.payment;
-           console.table(landAndOwner);
-            console.table(payment);
-            var html_owner = "";
-            $("#idd").val(data.land_faas_id);
+  
 
-            $("#pin").val(landAndOwner[0].pin);
-            $("#arp").val(landAndOwner[0].tax_dec_no);
-            $("#location").val(landAndOwner[0].barangay);
-            $("#assessed_value").val(money(landAndOwner[0].assessed_value));
-
-            $("#monthly_payment").val(money(payment.total_payment));
-            $("#mode_of_payment").val(payment.mode_of_payment);
-            $("#due_basic").val(money(payment.due_basic));
-            $("#due_sef").val(money(payment.due_sef));
-            $("#due_penalty").val(money(payment.due_penalty));
-            $("#due_discount").val(money(payment.due_discount));
-            $("#due_total").val(money(payment.due_total));
-            $("#tax_year").val(payment.tax_year);
-            $("#balance").val(money(payment.balance));
-
-            
-            $("#payment_id").val(payment.payment_id);
-            
-
-            
-            $.each(data['landAndOwner'], function( index, value ) {
-                html_owner += "<input type = 'text' class = 'form-control owners' value = '" +value['full_name']+"' readonly/> ";
-               
-               });
-               $("#owners").append(html_owner);
-               
-        },
-        error:function(){
-            console.log('mali');
-        },
-        });
-  }
-
-  $("#cash_payment").change(function(){
+//   $("#cash_payment").change(function(){
      
-        if($("#cash_payment").val() == "" || $("#cash_payment") == null){
-            $("#cash_change").val(money("0"));
-            $("#cash_payment").val(money("0"));
-        }
-        else{
-            $("#cash_change").val(money(subMoney($("#cash_payment").val(),$("#due_total").val())));
-        }
-        $("#cash_payment").val(money($("#cash_payment").val()));
+//         if($("#cash_payment").val() == "" || $("#cash_payment") == null){
+//             $("#cash_change").val(money("0"));
+//             $("#cash_payment").val(money("0"));
+//         }
+//         else{
+//             $("#cash_change").val(money(subMoney($("#cash_payment").val(),$("#due_total").val())));
+//         }
+//         $("#cash_payment").val(money($("#cash_payment").val()));
     
-  });
+//   });
 
   $("#payment_method").change(function(){
     console.log($(this).val());
@@ -504,6 +456,12 @@ function cancelOR(value){
     $("#collected_discount").val("");
     $("#collected_total").val("");
     var or_no = $(this).val();
+
+    if($(this).val().length > 7)
+    {
+        Swal.fire("Exceed O.R length");
+            $("#or_number").val("");
+    }
 
     
 $.ajax({
@@ -557,13 +515,13 @@ $.ajax({
                     add_line.push({
                         'ch[bank]' : $('#bank').val(),
                         'ch[check_number]' : $('#cheque_no').val(),
-                        'ch[check_amount]' : $('#cheque_amount').val(),
+                        'ch[check_amount]' : moneyToNum($('#cheque_amount').val()),
                         'ch[check_date]' :  $('#cheque_date').val(),
                         'ch[or_number]' :  $("#or_number").val()
 
                     });
                    
-                    total_cheque += parseFloat($("#cheque_amount").val()); 
+                    total_cheque += parseFloat(moneyToNum($("#cheque_amount").val())); 
                 
                     var table = document.getElementById("table_cheque");
                     var row= document.createElement("tr");
@@ -592,8 +550,8 @@ $.ajax({
             
                 }
 
-                console.log(add_line);
-                console.log(total_cheque);
+                // console.log(add_line);
+                // console.log(total_cheque);
 
 
     }
@@ -664,7 +622,7 @@ $("#clearance_fee").change(function(){
            
                 $.ajax({
                     type : 'POST',
-                    url : global.settings.url + 'Payment/clearance_check_or',
+                    url : global.settings.url + 'Payment/check_or',
                     data:{or_no: or_no},
                     dataType:"json",
                     success : function(data){
@@ -743,6 +701,38 @@ $("#clearance_fee").change(function(){
 
 });
 
+$("#changebutton").click(function(e){
+    e.preventDefault();
+    var  payment_mode = $("#payment_mode").val();
+    var tax_order_id = $("#tax_order_id").val();
+    var mode_of_payment = $('#mode_of_payment1').val();
+    var mop1 = $("#mop1").val();
+    var mop2 = $("#mop2").val();
+    var number_of_payment = $('#number_of_payment').val();
+
+    if(payment_mode == mode_of_payment)
+    {
+        
+    }
+    else{
+        
+         $.ajax({
+            type : 'POST',
+            url : global.settings.url + 'Payment/change_payment_method',
+            data:{number_of_payment:number_of_payment,tax_order_id:tax_order_id,mode_of_payment:mode_of_payment,mop1:mop1,mop2:mop2},  
+            dataType:"json",
+            success : function(data){
+                console.log(data);
+                }
+            });
+            }
+   
+
+
+});
+
+
+
 $("#number_of_payment").change(function(){
     var id = $("#mop_land_id").val();
     mop_compute(id);
@@ -765,9 +755,16 @@ function mop_compute(id)
         dataType:"json",
         success : function(data){
             var payment_html = "";
-            assessed_value = data;
-            var basic = parseFloat(assessed_value) * .01;
-            var payment = basic * 2;
+            assessed_value = data.assessed_value;
+            var payment = (parseFloat(assessed_value) * 0.01) * 2;
+            var basic = data.basic;
+            var discount = data.discount;
+            var penalty = data.penalty;
+            var tax = (parseFloat(assessed_value) * .01) *2;
+            var  pastpayment = ((parseFloat(basic) * 2) + (parseFloat(penalty) * 2) - (parseFloat(discount) * 2)) - tax;
+            
+            
+         
             if(balance == total)
             {
               
@@ -780,19 +777,20 @@ function mop_compute(id)
                       
                         case "Annually":
                             var first_payment = total;
-                            payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value = '"+money(first_payment)+"' readonly></div>";
+                            payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value = '"+first_payment+"' readonly></div>";
                             console.log(payment_html);
                         break;
                         case "Semi Annually":
-                            var first_payment = total / 2;
-                            var div_payment = total / 2;
-                            payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value ='"+money(first_payment)+"' readonly></div>";
+                            var first_payment = (parseFloat(tax)/ 2);
+                            var div_payment = parseFloat(tax)/ 2;
+                            console.log(first_payment);
+                            payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value ='"+first_payment+"' readonly></div>";
                             payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop2' class ='form-control ' name = 'mop2' value = '"+money(div_payment)+"' readonly></div>";
                             console.log(payment_html);
                         break;
                         case "Quarterly":
-                            var first_payment = total / 4;
-                            var div_payment = total / 4;
+                            var first_payment = parseFloat(tax)/ 4;;
+                            var div_payment = parseFloat(tax) / 4;
                             payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value ='"+money(first_payment)+"' readonly></div>";
                             payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop2' class ='form-control ' name = 'mop2' value = '"+money(div_payment)+"' readonly></div>";
                             payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop3' class ='form-control ' name = 'mop3' value ='"+money(div_payment)+"' readonly></div>";
@@ -813,20 +811,20 @@ function mop_compute(id)
                 {
                    
                      case "Annually":
-                         var first_payment = parseFloat(penalty) + parseFloat(payment);
+                         var first_payment =  parseFloat(pastpayment) + parseFloat(tax);
                          payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value = '"+money(first_payment)+"' readonly></div>";
                          console.log(payment_html);
                      break;
                      case "Semi Annually":
-                         var first_payment = parseFloat(penalty) + (parseFloat(payment) / 2);
-                         var div_payment = parseFloat(penalty) + (parseFloat(payment) / 2);
+                         var first_payment =  parseFloat(pastpayment) + (parseFloat(tax)/ 2);
+                         var div_payment = parseFloat(tax) / 2;
                          payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value ='"+money(first_payment)+"' readonly></div>";
                          payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop2' class ='form-control ' name = 'mop2' value = '"+money(div_payment)+"' readonly></div>";
                          console.log(payment_html);
                      break;
                      case "Quarterly":
-                         var first_payment = parseFloat(penalty) + (parseFloat(payment)/4);
-                         var div_payment = parseFloat(penalty) + (parseFloat(payment)/4);
+                        var first_payment =  parseFloat(pastpayment) + (parseFloat(tax)/ 4);
+                        var div_payment = parseFloat(tax) / 4;
                          payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value ='"+money(first_payment)+"' readonly></div>";
                          payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop2' class ='form-control ' name = 'mop2' value = '"+money(div_payment)+"' readonly></div>";
                          payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop3' class ='form-control ' name = 'mop3' value ='"+money(div_payment)+"' readonly></div>";
@@ -834,7 +832,7 @@ function mop_compute(id)
                          console.log(payment_html);
                      break;
                      case "Compromise":
-                         var first_payment = parseFloat(penalty) / parseFloat(compromise);
+                         var first_payment =  (parseFloat(pastpayment) + parseFloat(tax)) /parseFloat(compromise);
                         
                          payment_html += "<div class ='col-md-6 cmop'><input type = 'text' id = 'mop1' class ='form-control ' name = 'mop1' value ='"+money(first_payment)+"' readonly></div>";
                          
@@ -889,6 +887,14 @@ function mop_compute(id)
 
 }
 
+
+
+
+$("#cash_payment").click(function(){
+     
+    $("#cash_payment").val("");
+ 
+});
 
   function paymentHide()
   {

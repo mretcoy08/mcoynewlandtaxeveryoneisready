@@ -100,7 +100,7 @@
                                 </div> 
                                 <div class="form-group">
                                     <label class = "bmd-label-floating">Down Payment:</label>
-                                    <input type="text" class="form-control payment" name="down_payment" id="down_payment">
+                                    <input type="text" class="form-control payment money2" name="down_payment" id="down_payment">
                                 </div>  
                                 </div>
                                
@@ -139,7 +139,7 @@
 
                                     <div class="form-group">
                                         <label class = "bmd-label-floating">Assessed Value:</label>
-                                        <input type="number" class="form-control payment payment_decimal" name="assessed_value" id="assessed_value" readonly>
+                                        <input type="text" class="form-control payment payment_decimal" name="assessed_value" id="assessed_value" readonly>
                                     </div>  
 
                                     <div class="form-group">

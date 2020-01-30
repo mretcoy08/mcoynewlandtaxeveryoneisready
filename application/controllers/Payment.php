@@ -33,7 +33,7 @@ class Payment extends CI_Controller {
 			 "or_date" => clean_data(post("or_date")),
 		];
 
-		$query = $this->Main_model->insertWithId("or_pool",$orData);
+		// $queryORID = $this->Main_model->insertWithId("or_pool",$orData);
 
 
 		$getData = [
@@ -46,12 +46,18 @@ class Payment extends CI_Controller {
 			 "due_discount" => saveMoney(clean_data(post("due_discount"))),
 			 "tax_year" => clean_data(post("tax_year")),
 			 "payment_status" => "PAID",
-			 "or_pool_id" => $query,
+			//  "or_pool_id" => $queryORID,
 		];
 		$where = [
 			"id" => clean_data(post("payment_id")),
 		];
 
+		$balance = saveMoney(clean_data(post("balance")));
+		$due_total = saveMoney(clean_data(post("due_total")));
+		$due_penalty = saveMoney(clean_data(post("due_penalty")));
+		$due_discount = saveMoney(clean_data(post("due_discount")));
+
+		$sagot = Floatval($balance) - Floatval($due_total) + Floatval($due_penalty) - Floatval($due_discount);
 		$query = $this->Main_model->update("payment",$getData,$where);
 
 		$getId = $this->Main_model->select("payment","tax_order_id",$where);
@@ -63,9 +69,11 @@ class Payment extends CI_Controller {
 			];
 			 
 		}
+
+		
 		
 		$updateData = [	
-			"balance" => Floatval(saveMoney(clean_data(post("balance")))) - Floatval(saveMoney(clean_data(post("due_total")))) - Floatval(saveMoney(clean_data(post("due_penalty")))) + Floatval(saveMoney(clean_data(post("due_discount")))),
+			"balance" => $sagot,
 		];
 		$query = $this->Main_model->update("tax_order",$updateData,$whereTaxId);
 
@@ -84,17 +92,17 @@ class Payment extends CI_Controller {
 			$land_id = $k->land_id;
 		}
 
-		$table = "land";
-		$updateData = [
-			"last_payment_assessed" => $getData["tax_year"],
-		];
-		$where = [
-			"id" => $land_id,
-		];
-		$query = $this->Main_model->update($table,$updateData,$where);
+		// $table = "land";
+		// $updateData = [
+		// 	"last_payment_assessed" => $getData["tax_year"],
+		// ];
+		// $where = [
+		// 	"id" => $land_id,
+		// ];
+		// $query = $this->Main_model->update($table,$updateData,$where);
 
 
-		echo json_encode($payment_method);
+		echo json_encode($balance." ".$due_discount." ".$due_penalty." ".$due_total." ".$sagot);
 	}
 
 	public function payment_check()
@@ -120,6 +128,7 @@ class Payment extends CI_Controller {
 		
 		$where = [
 			"payment.payment_status" => "PAID",
+	
 		];
 		$payment = $this->Main_model->getPaymentHistory($pin,$where);
 
@@ -140,7 +149,7 @@ class Payment extends CI_Controller {
 		$where = [
 			"or_number" => clean_data(post("or_no")),
 		];
-		$query = $this->Main_model->check_or("payment","*",$where);
+		$query = $this->Main_model->check_or("or_pool","*",$where);
 
 		echo json_encode($query->num_rows());
 	}
@@ -236,10 +245,16 @@ class Payment extends CI_Controller {
 
 	public function clearance_payment()
 	{
+
+		$orData = [
+			"or_number" => clean_data(post("or_number")),
+			 "or_date" => clean_data(post("or_date")),
+		];
+
+		$queryORID = $this->Main_model->insertWithId("or_pool",$orData);
 		$data = [
 			"land_id" => clean_data(post("land_id")),
-			"or_number" => clean_data(post("clearance_ornumber")),
-			"or_date" =>  date("m/d/Y"),
+			"or_pool_id" => $queryORID,
 			"payment" =>  saveMoney(clean_data(post("clearance_fee"))),
 			"print" => 1
 		];
@@ -248,16 +263,7 @@ class Payment extends CI_Controller {
 
 		echo json_encode($data);
 	}
-	public function clearance_check_or()
-	{
-		$where = [
-			"or_number" => clean_data(post("or_no")),
-		];
-		$query = $this->Main_model->check_or("tax_clearance_payment","*",$where);
-
-		echo json_encode($query->num_rows());
-	}
-
+	
 
 	public function payment_compute()
 	{
@@ -440,15 +446,166 @@ class Payment extends CI_Controller {
 	public function mop_compute()
 	{
 		$where = [
-			"id" => clean_data(post("id")),
+			"land.id" => clean_data(post("id")),
 		];
 
-		$query = $this->Main_model->select("land","assessed_value",$where);
-		$data = "";
+		$data =[];
+		
+		$querytax = $this->Main_model->selecttax($where);
+		foreach($querytax->result() as $k)
+		{
+			$data["assessed_value"]= $k->assessed_value;
+			$data["basic"] = $k->basic;
+			$data["penalty"] = $k->penalty;
+			$data["discount"] = $k->discount;
+		}
+
+		echo json_encode($data);
+	}
+
+	public function change_payment_method()
+	{
+		$getData =[
+			"tax_order_id" => clean_data(post("tax_order_id")),
+			"mode_of_payment" => clean_data(post("mode_of_payment")),
+			"mop1" => saveMoney(clean_data(post("mop1"))),
+			"mop2" => saveMoney(clean_data(post("mop2"))),
+		];
+
+		$where = [
+			"id" => $getData["tax_order_id"],
+		];
+		$update = [
+			"mode_of_payment" => $getData["mode_of_payment"],
+		];
+
+		$this->Main_model->update("tax_order",$update,$where);
+
+		$query = $this->Main_model->select("tax_order","total,balance,id,year_assessed",$where);
+		$total;
+		$balanace;
+		$id;
+		$year;
 		foreach($query->result() as $k)
 		{
-			$data = $k->assessed_value;
+			$total = $k->total;
+			$balance = $k->balance;
+			$id = $k->id;
+			$year = $k->year_assessed;
 		}
+		$updatewhere = [
+			"tax_order_id" => $getData["tax_order_id"],
+			"tax_year" => $year,
+		];
+		$updatedata = [
+			"payment_status" => "MODE OF PAYMENT CHANGE"
+		];
+		$this->Main_model->updateStatus($updatedata,$updatewhere);
+
+		$data = "";
+		$yearnow = date("Y");
+		$startDateSemi = array("1/1/".$yearnow,"7/1/".$yearnow);
+		$dueDateSemi = array("6/30/".$yearnow,"12/31/".$yearnow);
+		$startDateQuarterly = array("1/1/".$yearnow,"4/1/".$yearnow,"7/1/".$yearnow,"10/1/".$yearnow);
+		$dueDateQuarterly = array("3/31/".$yearnow,"6/30/".$yearnow,"9/30/".$yearnow,"12/31/".$yearnow);
+		$startDateCompromise = array("1/1/".$yearnow,"2/1/".$yearnow,"3/1/".$yearnow,"4/1/".$yearnow,"5/1/".$yearnow,"6/1/".$yearnow,"7/1/".$yearnow,"8/1/".$yearnow,"9/1/".$yearnow,"10/1/".$yearnow,"11/1/".$yearnow,"12/1/".$yearnow);
+		$dueDateCompromise = array("1/31/".$yearnow,"2/29/".$yearnow,"3/31/".$yearnow,"4/30/".$yearnow,"5/31/".$yearnow,"6/30/".$yearnow,"7/31/".$yearnow,"8/31/".$yearnow,"9/30/".$yearnow,"10/31/".$yearnow,"11/30/".$yearnow,"12/31/".$yearnow);
+		if($total == $balance)
+		{
+			$first_payment = array($getData["mop1"]);
+			switch($getData["mode_of_payment"])
+			{
+				case "Semi Annually" : 
+
+					for($i=0;$i<2;$i++){
+						$insertData = [
+							"start_date" => $startDateSemi[$i],
+							"due_date" => $dueDateSemi[$i],
+							"due_basic" => $first_payment[$i] == NULL? Floatval($getData["mop2"]) / 2 : Floatval($getData["mop1"]) / 2,
+							"due_sef" => $first_payment[$i] == NULL? Floatval($getData["mop2"]) / 2 : Floatval($getData["mop1"]) / 2,
+							"tax_year" => date("Y"),
+							"payment_no" => $i+1,
+							"tax_order_id" => $getData["tax_order_id"],
+						];
+	
+						$this->Main_model->insert("payment",$insertData);
+					}
+					
+				break;
+				case "Quarterly" : 
+
+					for($i=0;$i<4;$i++){
+						$insertData = [
+							"start_date" => $startDateQuarterly[$i],
+							"due_date" => $dueDateQuarterly[$i],
+							"due_basic" => $first_payment[$i] == NULL? Floatval($getData["mop2"]) / 2 : Floatval($getData["mop1"]) / 2,
+							"due_sef" => $first_payment[$i] == NULL? Floatval($getData["mop2"]) / 2 : Floatval($getData["mop1"]) / 2,
+							"tax_year" => date("Y"),
+							"payment_no" => $i+1,
+							"tax_order_id" => $getData["tax_order_id"],
+						];
+						$this->Main_model->insert("payment",$insertData);
+					}
+				break;	
+				case "Compromise" :
+					$number_of_payment = clean_data(post("number_of_payment"));
+					for($i=0;$i<$number_of_payment;$i++){
+						$insertData = [
+							
+							"due_basic" => Floatval($first_payment[0])/2,
+							"due_sef" => Floatval($first_payment[0])/2,
+							"due_total" => $first_payment[0],
+							"tax_year" => date("Y"),
+							"payment_no" => $i+1,
+							"tax_order_id" => $getData["tax_order_id"],
+						];
+						$this->Main_model->insert("compromise",$insertData);
+					}
+				break;
+				
+			}
+		}
+		else{
+			
+			switch($getData["mode_of_payment"])
+			{
+
+				case "Quarterly" : 
+					for($i=0;$i<2;$i++){
+						$insertData = [
+							"start_date" => $startDateSemi[$i],
+							"due_date" => $dueDateSemi[$i],
+							"due_basic" => $first_payment[$i] == NULL? Floatval($getData["mop2"]) / 2 : Floatval($getData["mop1"]) / 2,
+							"due_sef" => $first_payment[$i] == NULL? Floatval($getData["mop2"]) / 2 : Floatval($getData["mop1"]) / 2,
+							"tax_year" => date("Y"),
+							"payment_no" => $i+1,
+							"tax_order_id" => $getData["tax_order_id"],
+						];
+						$this->Main_model->insert("payment",$insertData);
+					}
+				break;	
+				case "Compromise" :
+
+					$number_of_payment = clean_data(post("number_of_payment"));
+					for($i=0;$i<$number_of_payment;$i++){
+						$insertData = [
+							
+							"due_basic" => Floatval($first_payment[0])/2,
+							"due_sef" => Floatval($first_payment[0])/2,
+							"due_total" => $first_payment[0],
+							"tax_year" => date("Y"),
+							"payment_no" => $i+1,
+							"tax_order_id" => $getData["tax_order_id"],
+						];
+						$this->Main_model->insert("compromise",$insertData);
+					}
+				break;
+				
+			}
+		}
+
+
+
 
 		echo json_encode($data);
 	}

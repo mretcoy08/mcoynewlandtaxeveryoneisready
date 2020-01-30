@@ -7,7 +7,7 @@ ob_start();
 date_default_timezone_set('Asia/Manila');
 $date = date('m - d - Y');
 $pdf = new TCPDI(PDF_PAGE_ORIENTATION, 'mm', PDF_PAGE_FORMAT, true, 'UTF-8', false);
-$pdf->setSourceFile(APPPATH.'/../assets/PDF/rec.pdf');
+$pdf->setSourceFile(APPPATH.'/../assets/PDF/ortaxorder.pdf');
 $tpl = $pdf->importPage(1);
 $pdf->SetDisplayMode(100);
 $size = $pdf->getTemplateSize($tpl);

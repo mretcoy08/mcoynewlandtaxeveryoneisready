@@ -26,7 +26,7 @@ function penalty(payment,penaltyPercentage,monthDiff){
 function advYear(append)
 {
 	var year = new Date().getFullYear();
-	var advyear = year +6;
+	var advyear = year +3;
   
     var html = "";
     for(advyear;year<advyear;year++)
@@ -53,7 +53,7 @@ function year(append)
 
 
 
-function numbertowords(number) {  
+function asd(number) {  
     console.log(number);
 
     var digit = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];  

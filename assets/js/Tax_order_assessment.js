@@ -98,11 +98,10 @@ function assesst(val)
             $("#location").val(data.location);
             $("#status_of_tax").val(data.status_of_tax);
             $("#last_paid_assessed").val(data.last_paid_assessed);
-            var assessed_value = data.assessed_value;
-            assessed_value = parseFloat(assessed_value);
-            var assessev_val = assessed_value.toFixed(2);
             
-            $("#assessed_value").val(assessev_val);
+            console.log(data.assessed_value);
+            
+            $("#assessed_value").val(money(data.assessed_value));
             
            
             $.each(data['full_name'], function( index, value ) {
@@ -448,10 +447,6 @@ $("#compute").click(function(e){
 
 });
 
-$("#down_payment").change(function(){
-
-    $("#down_payment").val($("#down_payment").val() == ""? 0.00:money($("#down_payment").val()))
-});
 
 $("#mode_of_payment").change(function(){
     

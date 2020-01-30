@@ -186,7 +186,7 @@
             <div class="col-sm-6">
                 <div class="form-group">
                     <label class = "bmd-label-floating">OR Number:</label>
-                    <input type="text" class="form-control payment" name="or_number" id="or_number" >
+                    <input type="number" class="form-control payment" name="or_number" id="or_number" maxlength="7">
                 </div>  
             </div>
 
@@ -623,8 +623,6 @@
                             <td>OR number</td>
                             <td>Basic</td>
                             <td>SEF</td>
-                            <td>Penalty</td>
-                            <td>Discount</td>
                             <td>Total</td>
                             <td>Cash </td>
                             <td>Check</td>

@@ -26,10 +26,17 @@ class Compromise extends CI_Controller {
 	public function compromise_cash()
 	{
 		// action('HomeController@getIndex', $params);
+
+		$orData = [
+			"or_number" => clean_data(post("or_number")),
+			 "or_date" => clean_data(post("or_date")),
+		];
+
+		$queryORID = $this->Main_model->insertWithId("or_pool",$orData);
+
 		$getData = [
 			 "payor_name" => ucwords(clean_data(post("first_name")))." ".ucwords(clean_data(post("middle_name"))).' '.ucwords(clean_data(post("last_name"))),
-			 "or_number" => clean_data(post("or_number")),
-			 "or_date" => clean_data(post("or_date")),
+			 "or_pool_id" => $queryORID,
 			 "cash_rec" => saveMoney(clean_data(post("cash_rec"))),
 			 "check_rec" => saveMoney(clean_data(post("check_rec"))),
 			 "total_rec" => saveMoney(clean_data(post("total_rec"))),
@@ -140,7 +147,46 @@ class Compromise extends CI_Controller {
 
 		echo json_encode($data);
 	}
+	
 
+	public function compromise_history()
+	{
+		$getWhereHistory = [
+			"tax_order.id" => clean_data(post("id")),
+		];
+		$pinQuery = $this->Main_model->getPin($getWhereHistory);
+		$pin;
+		foreach($pinQuery->result() as $k)
+		{
+			$pin = $k->pin;
+		}
+
+		$where = [
+			"compromise.payment_status" => "PAID",
+	
+		];
+		$taxOrder = $this->Main_model->getTaxOrder($pin);
+		$payment = $this->Main_model->getCompromiseHistory($pin,$where);
+
+		$owner = $this->Main_model->getLandAndOwner($pin);
+
+		$data = [
+			"payment" => $payment->result(),
+			"owner" => $owner->result(),
+			"tax_order" => $taxOrder->result(),
+			"admin" => $this->session->userdata("role"),
+		];
+		echo json_encode($data);
+
+
+	}
+
+	public function view_receipt()
+	{
+		$data = "HELLO";
+		echo json_encode($data);
+		return $this->load->view('pages/viewReceipt',$data);
+	}
 
 
 	public function compromise_table()
@@ -189,7 +235,7 @@ class Compromise extends CI_Controller {
 			if($post->payment_status == "PENDING")
 			{
 				$nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'compromise(".$post->id.")' data-toggle='tooltip' title='TAX PAYMENT'><i class='fa fa-money-bill-alt'></i></button>
-				<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")'data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
+				<button class = ' btn btn-warning btn-sm payment' onclick='compromise_history(\"".$post->id."\")'data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
 				
 			}
 			else{

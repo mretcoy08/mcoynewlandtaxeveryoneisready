@@ -189,6 +189,8 @@ class Main_model extends CI_Model{
 						->from("payment")
 						->join("tax_order", "tax_order.id = payment.tax_order_id", "inner")
 						->where("payment.id",$where)
+						// ->where("payment_status", null)
+						// ->or_where("payment_status", "PENDING")
 						->get();
 
 		return $query->result();
@@ -232,9 +234,60 @@ class Main_model extends CI_Model{
 							->from("land")
 							->join("tax_order","tax_order.land_id = land.id", "inner")
 							->join("payment", "payment.tax_order_id = tax_order.id", "inner")
+							->join("or_pool", "or_pool.id = payment.or_pool_id", "inner")
 							->where("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)",$pin)
 							->where($where)
 							->order_by("payment.id", "DESC")
+							->get();
+		return $query;
+	}
+
+	public function getCompromiseHistory($pin,$where)
+	{
+		$query = $this->db->select("payor_name, or_number, or_date, due_basic, due_sef, due_total, tax_year, total_rec, payment_no, compromise.payment_status,cash_rec,check_rec,total_rec")
+							->from("land")
+							->join("tax_order","tax_order.land_id = land.id", "inner")
+							->join("compromise", "compromise.tax_order_id = tax_order.id", "inner")
+							->join("or_pool", "or_pool.id = compromise.or_pool_id", "inner")
+							->where("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)",$pin)
+							->where($where)
+							->order_by("compromise.id", "DESC")
+							->get();
+		return $query;
+	}
+
+	public function selecttax($where)
+	{
+		$query = $this->db->select("*")
+						->from("tax_order")
+						->join("land", "land.id = tax_order.land_id", "inner")
+						->where($where)
+						->order_by("tax_order.id","DESC")
+						->limit(1)
+						->get();
+		return $query;
+
+	}
+
+	// public function getTaxOrderAndLastPayment($where){
+	// 	$query = $this->db->select("*")
+	// 						->from("tax_order")
+	// 						->join("payment", "payment.tax_order_id = tax_order.id", "inner")
+	// 						->where($where)
+	// 						->order_by("payment.id", "DESC")
+	// 						->limit(1)
+	// 						->get();
+	// 	return $query;
+	// }
+
+	public function getTaxOrder($pin)
+	{
+		$query = $this->db->select("basic, sef, penalty, discount, total, balance, mode_of_payment,year_assessed,tax_year_start, tax_year_end")
+							->from("land")
+							->join("tax_order","tax_order.land_id = land.id", "inner")
+							->where("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)",$pin)
+							->order_by("tax_order.id", "DESC")
+							->limit(1)
 							->get();
 		return $query;
 	}
@@ -280,6 +333,18 @@ class Main_model extends CI_Model{
 	{
 		$query = $this->db->where($where)
 						->update($table,$data);
+
+		if($query){
+			return $query;
+		}
+	}
+
+	public function updateStatus($data,$where)
+	{
+		$query = $this->db->where("payment_status", "PENDING")
+						->or_where("payment_status", NULL)
+						->where($where)
+						->update("payment",$data);
 
 		if($query){
 			return $query;
