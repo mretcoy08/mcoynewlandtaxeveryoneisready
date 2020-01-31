@@ -25,8 +25,8 @@
 
 <div class="col-sm-12 col-lg-5 p-5">
   <div class="vl mt-4">
-  <h1 class="display-3 fadeIn first pl-0 p-5 title">
-    LAND TAX</h1>
+  <!-- <h1 class="display-3 fadeIn first pl-0 p-5 title">
+    LAND TAX</h1> -->
 
 <div id="drop"class="wrapper fadeInDown ">
   <div id="formContent">

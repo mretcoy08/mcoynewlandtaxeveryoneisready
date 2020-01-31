@@ -37,7 +37,7 @@
   body{
     width: auto;
     height: auto;
-    background-image: url(<?php echo base_url().'assets/img/concrete_seamless.png'?>) ;
+    background-image: url(<?php echo base_url().'assets/img/white-waves.png'?>) ;
     overflow:auto;
   }
   .form-rounded {
