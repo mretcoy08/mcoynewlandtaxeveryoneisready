@@ -23,9 +23,10 @@ function hide_element()
 
 function assessment_table(search)
 {   
-    $("#posts").dataTable().fnDestroy();
+
+    
     var assessment_search = search;
-    $(document).ready(function () {
+
         dataTable = $('#posts').DataTable({
             "processing": true,
             "serverSide": true,
@@ -48,7 +49,7 @@ function assessment_table(search)
                ]    
     
     
-        });
+   
     });
 }
 
@@ -56,27 +57,30 @@ function assessment_table(search)
 
 $("#assessment_search_btn").click(function(e){
     e.preventDefault();
+   
     // var check = $("#assessment_search").val();
-    $("#posts").dataTable().fnDestroy();
+    // $("#posts").dataTable().fnDestroy();
     var search = $("#assessment_search").val();
-        console.log(search);
-    if($.trim(search) == ''){
-        Swal.fire('You can\'t search with empty input field');
+    //     console.log(search);
+    // if($.trim(search) == ''){
+    //     Swal.fire('You can\'t search with empty input field');
        
-    }
-    else{
+    // }
+    // else{
         // $("#posts").dataTable().fnDestroy();
+        // $('#posts').DataTable().fnClearTable();
+      
+        $('#posts').DataTable().clear().destroy();
         assessment_table(search);
-    }
+    // }
     
 
 });
 
 function assesst(val)
-{   
-
-    $('#posts').dataTable().fnClearTable();
-    $('#posts').dataTable().fnDestroy();
+{   $('#assessment_search').val("");
+    $('#posts').DataTable().clear().destroy();
+   
     var id = val;
     console.log(val);
     $("#payment_info").show();

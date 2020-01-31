@@ -24,15 +24,15 @@
                         
                         
                         <div class="row">
-                          <div class = "col-md-12 col-xs-12">
-                            <table id="posts" class="table table-bordered" cellspacing="0" width="100%" style="width:100%">
+                          <div class = "col-12 col-md-12 col-xs-12">
+                            <table id="posts" class="table  table-sm table-striped table-bordered">
                                 <thead>
                                     <tr>
-                                        <th width = "20%">Owner</th>
-                                        <th width = "20%">Location</th>
-                                        <th width = "15%">Pin</th>
-                                        <th width = "15%">ARP No.</th>
-                                        <th width = "20%" class="disabled-sorting text-left">Actions</th>
+                                        <th scope="col">Owner</th>
+                                        <th scope="col">Location</th>
+                                        <th scope="col">Pin</th>
+                                        <th scope="col">ARP No.</th>
+                                        <th scope="col">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -185,7 +185,7 @@
 
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class = "table table-bordered" id ="tax_order_table">
+                                        <table class = "table table-striped" id ="tax_order_table">
                                             <thead>
                                             <tr>
                                                 <td>ARP NO.</td>
@@ -201,7 +201,7 @@
                                         </div>
                                         
                                         <div class="col-md-3">
-                                        <label for="" id = "mop">Payment:</label>
+                                        <label for="" id = "mop">Mode of Payment:</label>
                                             <div class="paymentsmop"></div>
                                         </div>
                                         <div class="col-md-6"></div>

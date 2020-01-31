@@ -230,7 +230,7 @@ class Main_model extends CI_Model{
 
 	public function getPaymentHistory($pin,$where)
 	{
-		$query = $this->db->select("payor_name, or_number, or_date, due_date, due_basic, due_sef, due_penalty, due_discount, due_total, tax_year, total_rec, payment_no, payment.payment_status, basic, sef, penalty, discount, total, mode_of_payment,cash_rec,check_rec,total_rec")
+		$query = $this->db->select("payor_name, or_number, or_date, due_date, due_basic, due_sef, due_penalty, due_discount, due_total, tax_year, total_rec, payment_no, payment.payment_status,cash_rec,check_rec,total_rec")
 							->from("land")
 							->join("tax_order","tax_order.land_id = land.id", "inner")
 							->join("payment", "payment.tax_order_id = tax_order.id", "inner")
@@ -487,6 +487,7 @@ function all_post_count($table,$data,$where)
 					->where("last_payment_assessed <",$yearDate)
 					->or_where("last_payment_assessed", null)
 					->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',tax_dec_no)",$assessment_search)
+					
 					->get();
 			return $query->num_rows();  
 
@@ -498,11 +499,10 @@ function all_post_count($table,$data,$where)
 			$query =$this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
 			->from("land")
 			->join("land_owner","land_owner.land_id = land.id", "inner")
-			->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',tax_dec_no)",$assessment_search)
 			->where("last_payment_assessed <",$yearDate)
 			->or_where("last_payment_assessed", null)
+			->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',tax_dec_no)",$assessment_search)
 			->get();	
-			
 			if($query->num_rows()>0)
 			{
 				return $query->result(); 
@@ -513,54 +513,52 @@ function all_post_count($table,$data,$where)
 			}
 			
 		}
-
-		function post_search_toa($limit,$start,$search,$col,$dir,$assessment_search)
-		{
-			$yearDate = date("Y");
-			$query =$this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
-			->from("land")
-			->join("land_owner","land_owner.land_id = land.id", "inner")
-			->like("CONCAT(first_name,' ',middle_name,' ',last_name) =", $search)
-			->or_like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',tax_dec_no)",$assessment_search)
-			->or_like("barangay", $search)
-			->or_like("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) = ", $search)
-			->or_like("tax_dec_no =", $search)
-			->order_by($col,$dir)
-			->where("last_payment_assessed <",$yearDate)
-			->or_where("last_payment_assessed", null)
-			->get();
+		// function post_search_toa($limit,$start,$search,$col,$dir,$assessment_search)
+		// {
+		// 	$yearDate = date("Y");
+		// 	$query =$this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
+		// 	->from("land")
+		// 	->join("land_owner","land_owner.land_id = land.id", "inner")
+		// 	// ->like("CONCAT(first_name,' ',middle_name,' ',last_name) =", $search)
+		// 	// ->like("tax_dec_no",$assessment_search)
+		// 	// ->or_like("barangay", $search)
+		// 	// ->or_like("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) = ", $search)
+		// 	// ->or_like("tax_dec_no =", $search)
+		// 	// ->order_by($col,$dir)
+		// 	// ->where("last_payment_assessed <",$yearDate)
+		// 	// ->or_where("last_payment_assessed", null)
+		// 	->get();
 
 		
-			if($query->num_rows()>0)
-			{
-				return $query->result();  
-			}
-			else
-			{
-				return null;
-			}
-		}
+		// 	if($query->num_rows()>0)
+		// 	{
+		// 		return $query->result();  
+		// 	}
+		// 	else
+		// 	{
+		// 		return null;
+		// 	}
+		// }
 
-		function post_search_count_toa($search,$assessment_search)
-		{	
-			$yearDate = date("Y");
-			$query =$this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
-			->from("land")
-			->join("land_owner","land_owner.land_id = land.id", "inner")
-			->join("land_owner","land_owner.land_id = land.id", "inner")
-			->like("CONCAT(first_name,' ',middle_name,' ',last_name) =", $search)
-			->or_like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',tax_dec_no)",$assessment_search)
-			->or_like("barangay", $search)
-			->or_like("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) = ", $search)
-			->or_like("tax_dec_no =", $search)
-			->order_by($col,$dir)
-			->where("last_payment_assessed <",$yearDate)
-			->or_where("last_payment_assessed", null)
-			->order_by($col,$dir)
-			->get();
+		// function post_search_count_toa($search,$assessment_search)
+		// {	
+		// 	$yearDate = date("Y");
+		// 	$query =$this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
+		// 	->from("land")
+		// 	->join("land_owner","land_owner.land_id = land.id", "inner")
+		// 	->join("land_owner","land_owner.land_id = land.id", "inner")
+		// 	// ->like("CONCAT(first_name,' ',middle_name,' ',last_name) =", $search)
+		// 	// ->like("tax_dec_no",$assessment_search)
+		// 	// ->or_like("barangay", $search)
+		// 	// ->or_like("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) = ", $search)
+		// 	// ->or_like("tax_dec_no =", $search)
+		// 	// ->where("last_payment_assessed <",$yearDate)
+		// 	// ->or_where("last_payment_assessed", null)
+		// 	// ->order_by($col,$dir)
+		// 	->get();
 
-			return $query->num_rows();
-		}
+		// 	return $query->num_rows();
+		// }
 
 		// END OF DATA TABLES FOR TAX ORDER ASSESSMENT
 

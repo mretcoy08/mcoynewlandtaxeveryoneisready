@@ -130,15 +130,20 @@ class Payment extends CI_Controller {
 			"payment.payment_status" => "PAID",
 	
 		];
-		$payment = $this->Main_model->getPaymentHistory($pin,$where);
 
+
+		$taxOrder = $this->Main_model->getTaxOrder($pin);
+	
+		$payment = $this->Main_model->getPaymentHistory($pin,$where);
 		$owner = $this->Main_model->getLandAndOwner($pin);
 
 		$data = [
 			"payment" => $payment->result(),
 			"owner" => $owner->result(),
+			"tax_order" => $taxOrder->result(),
 			"admin" => $this->session->userdata("role"),
 		];
+		
 		echo json_encode($data);
 
 		

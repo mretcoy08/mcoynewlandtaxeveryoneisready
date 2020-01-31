@@ -36,6 +36,7 @@ $(document).ready(function(){
 
 
 $(document).ready(function () {
+    
     dataTable = $('#posts').DataTable({
         "processing": true,
         "serverSide": true,
@@ -224,13 +225,12 @@ $(document).ready(function () {
             var html_paymenthistorydata;
             var payment = data['payment'];
             var owner = data['owner'];
-            console.log(owner[0]['pin']);
-            console.log(payment);
-            var basic = payment[0]['basic'] ? payment[0]['basic'] : 0;
-            var sef = payment[0]['sef'] ?  payment[0]['sef'] : 0;
-            var penalty = payment[0]['penalty'] ? payment[0]['penalty'] : 0;
-            var discount = payment[0]['discount'] ? payment[0]['discount'] : 0;
-            var total = payment[0]['total'] ? payment[0]['total'] : 0;
+            var tax_order = data["tax_order"]
+            var basic = tax_order[0]['basic'] ? tax_order[0]['basic'] : 0;
+            var sef = tax_order[0]['sef'] ?  tax_order[0]['sef'] : 0;
+            var penalty = tax_order[0]['penalty'] ? tax_order[0]['penalty'] : 0;
+            var discount = tax_order[0]['discount'] ? tax_order[0]['discount'] : 0;
+            var total = tax_order[0]['total'] ? tax_order[0]['total'] : 0;
            $("#viewPayment").modal("show");
   
            $("#idpin").val(id);
@@ -238,7 +238,7 @@ $(document).ready(function () {
            $('#paymenthistory_tax_dec_no').val(owner[0]['tax_dec_no']);
            $('#paymenthistory_assessed_val').val(money(owner[0]['assessed_value']));
            $('#paymenthistory_location').val('Barangay '+owner[0]['barangay'] +' San Pablo City, Laguna');
-           $('#paymenthistory_mode_of_payment').val(payment[0]['mode_of_payment']);
+           $('#paymenthistory_mode_of_payment').val(tax_order[0]['mode_of_payment']);
            $('#paymenthistory_basic').val(money(basic));
            $('#paymenthistory_sef').val(money(sef));
            $('#paymenthistory_penalty').val(money(penalty));

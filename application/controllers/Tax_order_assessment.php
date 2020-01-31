@@ -99,7 +99,7 @@ class Tax_order_assessment extends CI_Controller {
 			$nestedData['location'] = $post->barangay;
 			$nestedData['pin'] = $post->pin;
 			$nestedData['tax_dec_no'] = $post->tax_dec_no;
-			$nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'assesst(".$post->id.")'><i class='fa fa-edit'></i></button>";
+			$nestedData['action'] = "<button class = ' btn btn-success btn-sm blah' onclick= 'assesst(".$post->id.")'><i class='fa fa-edit'></i></button>";
 
 			$data[] = $nestedData;
 			}
