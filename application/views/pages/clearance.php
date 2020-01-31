@@ -1,12 +1,24 @@
+
+<div class="container">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb rgba-blue-grey-light py-3 ">
+			<li class="breadcrumb-item"><a href="<?php echo base_url() ?>/Dashboard"><i
+						class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Clearance</li>
+		
+		</ol>
+	</nav>
+</div>
+
+
 <div class="content">
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-primary">
+                    <div class="card-header bg-primary">
                   
-                        <h4 class="card-title "></h4>
-                            <p class="card-category"></p>
+                     
                         </div>
                    
                         <div class="card-body">
@@ -37,14 +49,7 @@
                                 <tbody>
                                  
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th width = "25%">Owner's name</th>
-                                        <th width = "25%">Pin</th>
-                                        <th width = "25%">ARP</th>
-                                        <th class="disabled-sorting text-left">Actions</th>
-                                    </tr>
-                                </tfoot>
+                               
                                 
                             </table>
                           </div>
@@ -92,9 +97,9 @@
 
       <!-- Modal Header -->
       
-      <div class="modal-header">
+      <div class="modal-header bg-primary">
        
-        <h4 class="modal-title text-primary" id= "h4user">Print</h4>
+        <h4 class="modal-title text-white" id= "h4user">Print</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
@@ -149,8 +154,11 @@
         
          <!-- Modal footer -->
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" id = "printbtn"><i class = "fa fa-print"></i> Print</button>
+      <div class="col-12 text-center">
+      <button type="submit" class="btn btn-primary" id = "printbtn"><i class = "fa fa-print"></i> Print</button>
+  
       </div>
+          </div>
         </form>
     </div>
   </div>

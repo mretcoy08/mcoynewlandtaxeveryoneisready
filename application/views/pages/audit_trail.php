@@ -1,12 +1,25 @@
+
+
+
+<div class="container">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb rgba-blue-grey-light py-3 ">
+			<li class="breadcrumb-item"><a href="<?php echo base_url() ?>/Dashboard"><i
+						class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Audit Trail</li>
+		
+		</ol>
+	</nav>
+</div>
+
+
 <div class="content">
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-primary">
+                    <div class="card-header bg-primary">
                   
-                        <h4 class="card-title "></h4>
-                            <p class="card-category"></p>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -54,15 +67,7 @@
                                 <tbody>
                                  
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th width = "20%">User</th>
-                                        <th width = "20%">Action</th>
-                                        <th width = "20%">What</th>
-                                        <th width = "20%">Module</th>
-                                        <th class="disabled-sorting text-left" width = "20%">Date</th>
-                                    </tr>
-                                </tfoot>
+                               
                                 
                             </table>
                           </div>

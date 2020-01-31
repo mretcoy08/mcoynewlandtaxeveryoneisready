@@ -1,12 +1,23 @@
+<div class="container">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb rgba-blue-grey-light py-3 ">
+			<li class="breadcrumb-item"><a href="<?php echo base_url() ?>/Dashboard"><i
+						class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Land And Owner</li>
+		
+		</ol>
+	</nav>
+</div>
+
+
 <div class="content">
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-primary">
+                    <div class="card-header bg-primary">
                   
-                        <h4 class="card-title "></h4>
-                            <p class="card-category"></p>
+                       
                         </div>
                         <div class="card-body">
                             <div class="col-md-3">
@@ -32,16 +43,7 @@
                                 <tbody>
                                  
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th width = "20%">Pin</th>
-                                        <th width = "20%">ARP No.</th>
-                                        <th width = "15%">Class</th>
-                                        <th width = "15%">Assessed Value</th>
-                                        <th width = "15%">Land Status</th>
-                                        <th class="disabled-sorting text-left">Actions</th>
-                                    </tr>
-                                </tfoot>
+                               
                                 
                             </table>
                           </div>
@@ -285,9 +287,9 @@
 
       <!-- Modal Header -->
       
-      <div class="modal-header">
+      <div class="modal-header bg-primary">
        
-        <h4 class="modal-title text-primary text-center" id= "h4user">Update Land Information</h4>
+        <h4 class="modal-title text-white text-center" id= "h4user">Update Land Information</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
@@ -296,7 +298,7 @@
         <!-- Modal body -->
         <form id = "update_land">
         <hr>
-        <h5 class = "text-center text-primary">Land Information</h5>
+        <h4 class = "text-center text-primary"><strong>Land Information</h4>
         <hr>
         <strong><label for="">Pin No.</label></strong>
       <div class="row">
@@ -481,8 +483,12 @@
       </div>
         
          <!-- Modal footer -->
-      <div class="modal-footer">
+         <div class="modal-footer">
+         <div class="col-12 text-center">
+ 
         <button type="submit" class="btn btn-primary" id = "addbtn">Submit</button>
+  
+      </div>
       </div>
         </form>
     </div>
@@ -496,9 +502,9 @@
 
       <!-- Modal Header -->
       
-      <div class="modal-header">
+      <div class="modal-header bg-primary">
        
-        <h4 class="modal-title text-primary text-center" id= "h4user">Update Owner Information</h4>
+        <h4 class="modal-title text-white text-center" id= "h4user">Update Owner Information</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
@@ -509,7 +515,7 @@
        
        
     <hr>
-    <h5 class = "text-center text-primary">Owner Information</h5>
+    <h4 class = "text-center text-primary"><strong>Owner Information</h4>
     <hr>
       <div class="row">
            
@@ -520,8 +526,9 @@
                     <input type="text" class = "form-control new_input" id = "middle_name" class = "middle_name">
                     <label for="" class="bmb-label-floating"><strong>Last Name:</strong></label>
                     <input type="text" class = "form-control new_input" id = "last_name" class = "last_name">
-                    <button type="button" class="btn btn-primary float-right" id = "upadditional_owner">Add Owner</button>
-                
+                    <div class="col-12 text-center">
+                    <button type="button" class="btn btn-primary" id = "upadditional_owner">Add Owner</button>
+                    </div>
             </div>
             <div class="col-md-9">
                 <table class = "table table-striped table-hover table-bordered" id = "uptableOwner">
@@ -548,7 +555,10 @@
         
          <!-- Modal footer -->
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" id = "addbtn">Submit</button>
+      <div class="col-12 text-center">
+      <button type="submit" class="btn btn-primary" id = "addbtn">Submit</button>
+      </div>
+        
       </div>
         </form>
     </div>

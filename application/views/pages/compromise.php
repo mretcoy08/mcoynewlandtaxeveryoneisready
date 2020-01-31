@@ -1,3 +1,16 @@
+
+<div class="container">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb rgba-blue-grey-light py-3 ">
+			<li class="breadcrumb-item"><a href="<?php echo base_url() ?>/Dashboard"><i
+						class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Compromise Payment</li>
+		
+		</ol>
+	</nav>
+</div>
+
+
 <div class="content">
 
 
@@ -5,14 +18,13 @@
 <div class="container">
 
 </div>
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-primary">
+                    <div class="card-header bg-primary">
                   
-                        <h4 class="card-title "></h4>
-                            <p class="card-category"></p>
+                        
                         </div>
                         <div class="card-body">
                            
@@ -44,16 +56,7 @@
                                 <tbody>
                                  
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th width = "15%">Owner</th>
-                                        <th width = "15%">Location</th>
-                                        <th width = "15%">Pin</th>
-                                        <th width = "7%">ARP No.</th>
-                                        <th width = "7%">Year Assessed</th>
-                                        <th width = "20%" class="disabled-sorting text-left">Actions</th>
-                                    </tr>
-                                </tfoot>
+                               
                                 
                             </table>
                           </div>
@@ -81,9 +84,9 @@
 
       <!-- Modal Header -->
       
-      <div class="modal-header">
+      <div class="modal-header bg-primary">
        
-        <h4 class="modal-title text-primary" id= "h4user">PAYMENT</h4>
+        <h4 class="modal-title text-white" id= "h4user">PAYMENT</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
@@ -431,7 +434,10 @@
       <input type="hidden" name = "idd" id = "idd">   
          <!-- Modal footer -->
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" id = "paymentbtn">Submit</button>
+      <div class="col-12 text-center">
+      <button type="submit" class="btn btn-primary" id = "paymentbtn">Submit</button>
+      </div>
+       
       </div>
         </form>
     </div>
@@ -539,9 +545,9 @@
 
       <!-- Modal Header -->
       
-      <div class="modal-header">
+      <div class="modal-header bg-primary">
        
-        <h4 class="modal-title text-primary" id= "h4user">Payment History</h4>
+        <h4 class="modal-title text-white" id= "h4user">Payment History</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 

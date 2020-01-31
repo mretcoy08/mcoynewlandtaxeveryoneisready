@@ -1,12 +1,22 @@
+<div class="container">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb rgba-blue-grey-light py-3 ">
+			<li class="breadcrumb-item"><a href="<?php echo base_url() ?>/Dashboard"><i
+						class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+			<li class="breadcrumb-item active" aria-current="page">User Management</li>
+		
+		</ol>
+	</nav>
+</div>
+
 <div class="content">
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-primary">
+                    <div class="card-header  bg-primary">
                   
-                        <h4 class="card-title "></h4>
-                            <p class="card-category"></p>
+                          
                         </div>
                         <div class="card-body">
                             <div class="col-md-3">
@@ -19,7 +29,7 @@
                         
                         <div class="row">
                           <div class = "col-md-12 col-xs-12">
-                            <table id="posts" class="table table-bordered" cellspacing="0" width="100%" style="width:100%">
+                            <table id="posts" class="table  table-bordered" cellspacing="0" width="100%" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th width = "20%">Username</th>
@@ -31,14 +41,7 @@
                                 <tbody>
                                  
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th width = "">Username</th>
-                                        <th width = "">Name</th>
-                                        <th width = "">Contact Number</th>
-                                        <th class="disabled-sorting text-left">Actions</th>
-                                    </tr>
-                                </tfoot>
+                               
                                 
                             </table>
                           </div>
@@ -63,9 +66,9 @@
 
       <!-- Modal Header -->
       
-      <div class="modal-header">
+      <div class="modal-header bg-primary">
        
-        <h4 class="modal-title text-primary" id= "h4user">Add User</h4>
+        <h4 class="modal-title text-white" id= "h4user">Add User</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
@@ -149,7 +152,10 @@
         
          <!-- Modal footer -->
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" id = "addbtn">Add</button>
+      <div class="col-12 text-center">
+      <button type="submit" class="btn btn-primary" id = "addbtn">Add</button>
+      </div>
+       
       </div>
         </form>
     </div>

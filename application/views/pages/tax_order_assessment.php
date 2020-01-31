@@ -1,13 +1,23 @@
+<div class="container">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb rgba-blue-grey-light py-3 ">
+			<li class="breadcrumb-item"><a href="<?php echo base_url() ?>/Dashboard"><i
+						class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Tax Order Assessment</li>
+		
+		</ol>
+	</nav>
+</div>
+
+
 <div class="content">
-    <div class="container-fluid">
+    <div class="container">
         <!-- container fluid -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-primary">
+                    <div class="card-header bg-primary">
                   
-                        <h4 class="card-title "></h4>
-                            <p class="card-category"></p>
                         </div>
                         <div class="card-body">
                         <div class="row">
@@ -57,10 +67,10 @@
        <div class="row" id = "payment_info">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-primary">
+                    <div class="card-header bg-primary">
                   
-                        <h5 class="card-title text-center text-primary"><STRONG>Payment Information</STRONG></h5>
-                            <p class="card-category"></p>
+                        <h4 class="card-title pt-2 text-center text-white"><STRONG>PAYMENT INFORMATION</STRONG></h4>
+                   
                         </div>
                         <div class="card-body">
 
@@ -155,10 +165,14 @@
                                     </div>  
 
                                     <input type="hidden" name = "idd" id = "idd">
-                                    <button class = "btn btn-primary float-right" id = "compute">COMPUTE</button>
-                           
+
+                                   
                                 </div>
 
+                                <div class="col-12 text-center">
+                                    <button class = "btn btn-primary" id = "compute">COMPUTE</button>
+                           
+                                    </div>
                                   
 
                                 </div>
@@ -176,16 +190,16 @@
             <div class="col-md-12">
 
                 <div class="card">
-                        <div class="card-header card-header-primary">
+                        <div class="card-header bg-primary">
                   
-                            <h5 class="card-title text-center text-primary"><STRONG>REALTY TAX ORDER OF PAYMENT</STRONG></h5>
+                            <h4 class="card-title pt-2 text-center text-white"><STRONG>REALTY TAX ORDER OF PAYMENT</STRONG></h4>
                             <p class="card-category"></p>
                         </div>
                         <div class="card-body">
 
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class = "table table-striped" id ="tax_order_table">
+                                        <table class = "table table-bordered" id ="tax_order_table">
                                             <thead>
                                             <tr>
                                                 <td>ARP NO.</td>
@@ -223,10 +237,13 @@
                                             <input type="hidden" id = "total_penalty" name = "total_penalty">
                                             <input type="hidden" id = "total_discount" name = "total_discount">
                                             <input type="hidden" id = "total_basic" name = "total_basic">
-                                            <button class="btn btn-primary float-right" id = "viewTaxOrder">View Tax Order</button>
-                                        </div>
+                                       
                                         
-                                    
+                                        </div>
+                                        <div class="col-12 text-center">
+                                          
+                                          <button class="btn btn-primary " id = "viewTaxOrder">View Tax Order</button>
+                                      </div>
                                     
                                 </div>
                             
