@@ -101,7 +101,7 @@ $(document).ready(function () {
       {
         case "cash":
             paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
-
+     
         break;
 
         case "check":
@@ -124,6 +124,8 @@ $(document).ready(function () {
                 });
 
             }
+
+          
           
         break;
 
@@ -145,6 +147,8 @@ $(document).ready(function () {
                 });
 
             }
+
+            
          
         break;
       }
@@ -174,6 +178,27 @@ $(document).ready(function () {
                 '',
                 'success'
                 )
+                view_OR(payment_id);
+        },
+    });
+  }
+
+  $("#testbtn").click(function(){
+    view_OR(2);
+  });
+
+  function view_OR(id)
+  {
+    $.ajax({
+        type : 'POST',
+        url : global.settings.url + 'Payment/view_OR',
+        data: {id:id},
+        xhrFields: {	responseType: 'blob'},
+        success : function(data){
+            var url = window.URL.createObjectURL(data);
+            $('#myframe').attr('src',url);
+            $("#recieptmodal1").modal("show");
+           
         },
     });
   }

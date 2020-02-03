@@ -97,7 +97,7 @@ if ( ! function_exists('monthDiff')) {
 
     function monthDiff($lastMonth,$lastYear){	
 
-        $diff = ((date("Y")- $lastYear)*12)+date("m") - $lastMonth;
+        $diff = ((date("Y")- $lastYear)*12)+(date("m") - $lastMonth);
         return $diff;
     }
 }

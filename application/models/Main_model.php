@@ -93,6 +93,64 @@ class Main_model extends CI_Model{
 		return $query;
 	}
 
+	public function clearanceVerification($where)
+	{
+		$query = $this->db->select("tax_order.mode_of_payment, or_number, or_date, payment")
+						->from("or_pool")
+						->join("tax_clearance_payment tcp", "tcp.or_pool_id = or_pool.id", "inner")
+						->join("land", "land.id = tcp.land_id", "inner")
+						->join("tax_order", "land.id = tax_order.land_id", "inner")
+						->where($where)
+						->get();
+
+		return $query;
+	}
+
+	public function clearancePayment($where){
+		$query = $this->db->select("*")
+							->from("payment")
+							->join("or_pool","payment.or_pool_id = or_pool.id","inner")
+							->join("tax_order", "tax_order.id = payment.tax_order_id", "inner")
+							->where($where)
+							->order_by("payment.id", "DESC")
+							->limit(1)
+							->get();
+		return $query;			
+	}
+
+	public function clearanceCompromise($where)
+	{
+		$query = $this->db->select("*")
+						->from("compromise")
+						->join("or_pool", "compromise.or_pool_id = or_pool.id", "inner")
+						->join("tax_order", "tax_order.id = compromise.tax_order_id", "inner")
+						->where($where)
+						->order_by("compromise.id", "DESC")
+						->limit(1)
+						->get();
+		return $query;
+	}
+
+	public function clearanceLandData($where)
+	{
+		$query = $this->db->select("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, barangay, assessed_value")
+							->from("land")
+							->join("tax_order","tax_order.land_id = land.id","inner")
+							->where($where)
+							->get();
+			return $query;
+	}
+	public function clearanceOwnerData($where)
+	{
+		$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name")
+						->from("land_owner")
+						->join("land", "land_owner.land_id = land.id", "inner")
+						->join("tax_order", "tax_order.land_id = land.id", "inner")
+						->where($where)
+						->get();
+		return $query;
+	}
+
 	public function getBarangayAndSubdivision($where)
 	{
 		$query = $this->db->select("*")
@@ -302,11 +360,12 @@ class Main_model extends CI_Model{
 		return $query;
 	}
 
-	public function getClearance($where)
+	public function getLandAndOwnerClearance($where)
 	{
-		$query = $this->db->select("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, barangay, assessed_value, tax_clearance_payment.or_number,payment.due_total, payment.due_basic, payment.due_sef, tax_clearance_payment.or_date, payment.or_number, payment.or_date")
+		$query = $this->db->select("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, barangay, assessed_value, or_pool.or_number,payment.due_total, payment.due_basic, payment.due_sef, or_pool.or_date, payment.or_number, payment.or_date")
 							->from("land")
 							->join("tax_clearance_payment", "tax_clearance_payment.land_id = land.id", "inner")
+							->join("or_pool", "or_pool.id = tax_clearance_payment.or_pool_id", "inner")
 							->join("tax_order", "tax_order.land_id = land.id", "inner")
 							->join("payment", "payment.tax_order_id = tax_order.id", "inner")
 							->order_by("payment.id", "DESC")
@@ -315,6 +374,36 @@ class Main_model extends CI_Model{
 							->get();
 		return $query;
 	}
+
+	public function getPaymentClearance()
+	{
+		$query = $this->db->select("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, barangay, assessed_value, or_pool.or_number,payment.due_total, payment.due_basic, payment.due_sef, or_pool.or_date, payment.or_number, payment.or_date")
+							->from("land")
+							->join("tax_clearance_payment", "tax_clearance_payment.land_id = land.id", "inner")
+							->join("or_pool", "or_pool.id = tax_clearance_payment.or_pool_id", "inner")
+							->join("tax_order", "tax_order.land_id = land.id", "inner")
+							->join("payment", "payment.tax_order_id = tax_order.id", "inner")
+							->order_by("payment.id", "DESC")
+							->limit(1)
+							->where($where)
+							->get();
+		return $query;
+	}
+
+
+	public function getOrPayment($where)
+	{
+		$query = $this->db->select("payor_name, barangay, tax_dec_no, basic, penalty, total, or_date, mode_of_payment, due_basic, payment_no, due_penalty, due_date, due_total, CONCAT(lo.first_name,' ',lo.middle_name,' ',lo.last_name) as ofull_name")
+						->from("payment")
+						->join("or_pool", "or_pool.id = payment.or_pool_id", "inner")
+						->join("tax_order", "tax_order.id = payment.tax_order_id", "inner")
+						->join("land", "land.id = tax_order.land_id", "inner")
+						->join("land_owner lo", "lo.land_id = land.id", "inner")
+						->where($where)
+						->get();
+		return $query;
+	}
+	
 
 //END OF SELECT
 
@@ -731,11 +820,12 @@ function all_post_count($table,$data,$where)
 		// CLEARANCE TABLE
 		function all_post_clearance_count($where)
 		{  
-			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
+			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id, tax_order.id as tax_id")
 							->from("land")
 							->join("tax_clearance_payment", "land.id = tax_clearance_payment.land_id", "inner")
 							->join("land_owner", "land_owner.land_id = land.id", "inner")
-							// ->where($where)
+							->join("tax_order", "tax_order.land_id = land.id", "inner")
+							->where($where)
 							->get();
 			return $query->num_rows();  
 
@@ -743,10 +833,11 @@ function all_post_count($table,$data,$where)
 
 		function all_post_clearance($limit,$start,$col,$dir,$where)
 		{   
-			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
+			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id, tax_order.id as tax_id")
 							->from("land")
 							->join("tax_clearance_payment", "land.id = tax_clearance_payment.land_id", "inner")
 							->join("land_owner", "land_owner.land_id = land.id", "inner")
+							->join("tax_order", "tax_order.land_id = land.id", "inner")
 							->where($where)
 							->get();	
 			
@@ -763,10 +854,11 @@ function all_post_count($table,$data,$where)
 
 		function all_post_clearance_search($limit,$start,$search,$col,$dir,$where)
 		{
-			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
+			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id,tax_order.id as tax_id")
 							->from("land")
 							->join("tax_clearance_payment", "land.id = tax_clearance_payment.land_id", "inner")
 							->join("land_owner", "land_owner.land_id = land.id", "inner")
+							->join("tax_order", "tax_order.land_id = land.id", "inner")
 							->where($where)
 							->get();
 		
@@ -782,10 +874,11 @@ function all_post_count($table,$data,$where)
 
 		function all_post_clearance_search_count($search,$where)
 		{	
-			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
+			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id, tax_order.id as tax_id")
 							->from("land")
 							->join("tax_clearance_payment", "land.id = tax_clearance_payment.land_id", "inner")
 							->join("land_owner", "land_owner.land_id = land.id", "inner")
+							->join("tax_order", "tax_order.land_id = land.id", "inner")
 							->where($where)
 							->get();	
 

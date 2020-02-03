@@ -181,6 +181,7 @@ $("#print_data").submit(function(e){
                 },
                 success: function(res) {
                     console.log(res);
+                    $('#printData').modal('hide');
                     var url = window.URL.createObjectURL(res);
                     $('#myframe').attr('src',url);
                 },
@@ -209,6 +210,55 @@ $("#print_data").submit(function(e){
    
 });
 
+
+function printmodalshow()
+{
+    $.ajax({  
+        type: 'POST',  
+        url: global.settings.url + '/Clearance/clearance_print', 
+        data: $('#print_data').serialize(),
+        xhrFields: {
+            responseType: 'blob'
+        },
+        success: function(res) {
+            console.log(res);
+            var url = window.URL.createObjectURL(res);
+            $('#myframe').attr('src',url);
+
+            Swal.fire({
+                title: 'Done Printing?',
+                text: "This is the only time you can re-print!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+              }).then((result) => {
+                if (result.value) {
+                    
+
+                    $.ajax({
+                        type : 'POST',
+                        url : global.settings.url + 'Clearance/clearance_clear',
+                        // data:{},
+                        dataType:"json",
+                        success: function(data) {
+                            console.log(data);
+
+
+                            
+                        },
+                    });
+                }
+              })
+
+
+        },
+        error: function(xhr){
+            xhr.responseText()
+        }
+        });
+}
 
 
 

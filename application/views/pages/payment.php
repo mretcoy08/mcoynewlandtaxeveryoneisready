@@ -59,6 +59,8 @@
 
                     </div>
                     <!-- end content-->
+
+                    <button class = "btn btn-danger btn-block" id = "testbtn">test btn</button>
                 </div>
                 <!--  end card  -->
             </div>
@@ -433,7 +435,7 @@
 </div>
 
 
-<div class="modal fade" id="recieptmodal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="clearancereceipt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
@@ -454,7 +456,7 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="recieptmodal4" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="clearancereceipt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
@@ -477,7 +479,7 @@
 
 
 <!-- resibo modal -->
-<div class="modal fade" id="recieptmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="recieptmodal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">

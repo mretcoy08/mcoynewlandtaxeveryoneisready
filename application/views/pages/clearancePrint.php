@@ -20,25 +20,28 @@ $pdf->setFillColor(0,0,0,0);
 
 
 
-$pin = $landinfo['pin'];
-$arp = $landinfo['arp'];
-$location = $landinfo['location'];
-$assessed_value = $landinfo['assessed_value'];
-$or_number = $landinfo['or_number'];
-$date_of_payment = $landinfo['date_of_payment'];
-$amount_paid = $landinfo['sub_total'];
-$basic = $landinfo['basic'];
-$sef = $landinfo['sef'];
 
-$certification_fee = $request['certification_fee'];
-$or_num = $request['or_num'];
-$clearancedate = $request['clearancedate'];
-$amount = $request['certification_fee'];
+$pin = $landData[0]->pin;
+$arp = $landData[0]->tax_dec_no;
+$location = $landData[0]->barangay;
+$assessed_value = $landData[0]->assessed_value;
+$or_number = $paymentData[0]->or_number;
+$date_of_payment = $paymentData[0]->or_date;
+$amount_paid = showMoney($paymentData[0]->due_total);
+$basic = showMoney(Floatval($assessed_value)*.01);
+$sef = showMoney(Floatval($assessed_value)*.01);
+$amount = $purposeData['payment'];
+
+$certification_fee = $purposeData['certification_fee'];
+$or_num = $purposeData['or_number'];
+$clearancedate = $purposeData['or_date'];
 
 
 
-$purpose = $request['purpose'];
-$request = $request['request'];
+
+$purpose = $purposeData['purpose'];
+$request = $purposeData['request'];
+
 
 
 
@@ -57,19 +60,19 @@ $request = $request['request'];
 
 $pdf->Text(150,36,date("F d, Y"));
 
-$count = count($owner);
+$count = count($ownerData);
 // $pdf->setCellPaddings(2, 4, 6, 8);
 $txt ="";
 for($i=0;$i<$count;$i++){
 
-   $txt .= $owner[$i]['full_name'] .", ";
+   
+$txt .= $ownerData[$i]->full_name .", ";
 
 }
 
-
 $pdf->setCellPaddings(2, 2, 2, 8);
  $txt = ($txt == null ? '' : $txt);
-$pdf->MultiCell(65,20, $txt."\n", 0, 'L', 1, 1,128, 63, true, 0, false, true, 19, 'M', true);
+$pdf->MultiCell(55,20, $txt."\n", 0, 'L', 1, 1,130, 63, true, 0, false, true, 19, 'M', true);
 
 
 $day = date("d");
@@ -136,12 +139,9 @@ $pdf->Text(35,240,$or_num);
 //Date
 $pdf->Text(35,245,$clearancedate);
 //AMOUNT
-$pdf->Text(35,250,$certification_fee);
+$pdf->Text(35,250,$amount);
 //remarks
-$pdf->Text(35,255,$amount);
-
-
-
+// $pdf->Text(35,255,);
 
 
 

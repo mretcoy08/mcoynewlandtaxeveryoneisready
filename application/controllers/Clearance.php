@@ -69,7 +69,7 @@ class Clearance extends CI_Controller {
 					$nestedData['owner'] = $post->full_name;
 					$nestedData['pin'] = $post->pin;
 					$nestedData['tax_dec_no'] = $post->tax_dec_no;
-					$nestedData['action'] = "<button class = 'btn btn-primary btn-sm' onclick= 'clearance(".$post->id.")'><i class = 'fa fa-print'></i></button>";
+					$nestedData['action'] = "<button class = 'btn btn-primary btn-sm' onclick= 'clearance(".$post->tax_id.")'><i class = 'fa fa-print'></i></button>";
 					
 					$data[] = $nestedData;
 				}
@@ -97,10 +97,10 @@ class Clearance extends CI_Controller {
 		
 		$where = [
 			"or_number" => $getData["or_number"],
-			"land_id" => $getData["tax_idd"],
+			"tax_order.id" => $getData["tax_idd"],
 		];
 
-		$query = $this->Main_model->select("tax_clearance_payment", "*", $where);
+		$query = $this->Main_model->clearanceVerification($where);
 
 		if($query->num_rows()>0){
 			echo json_encode("success");
@@ -119,54 +119,111 @@ class Clearance extends CI_Controller {
 			"purpose" => clean_data(post("purpose")),
 			"tax_idd" => clean_data(post("tax_idd"))
 		];
-		$landData = [];
-		$clearanceData = [];
-		$ownerData = [];
+		$clearancePaymentData;
+		$clearanceLandData;
+		$clearanceOwnerData;
 
 		
 		$where = [
-			"or_number" => $getData["or_number"],
-			"land_id" => $getData["tax_idd"],
+			"tax_order.id" => $getData["tax_idd"],
 		];
 
-		$query = $this->Main_model->select("tax_clearance_payment", "*", $where);
+		$query = $this->Main_model->clearanceVerification($where);
 		$getClearance;
 		if($query->num_rows()){
 			foreach($query->result() as $k)
 			{
-				$clearanceData["or_number"] = $k->or_number;
-				$clearanceData["or_date"] = $k->or_date;
-				$clearanceData["payment"] = $k->payment;
+				$getData["or_number"] = $k->or_number;
+				$getData["or_date"] = $k->or_date;
+				$getData["payment"] = $k->payment;
+				$getData["mode_of_payment"] = $k->mode_of_payment;
 			}
 
-			$whereData1 = [
-				"land.id" => $where["land_id"]
-			];
-			$getClearance = $this->Main_model->getClearance($whereData1);
-			foreach($getClearance->result() as $k)
+			if($getData["mode_of_payment"] == "Compromise")
 			{
-				$landData["pin"] = $k->pin;
-				$landData["tax_dec_no"] = $k->tax_dec_no;
-				$landData["barangay"] = $k->barangay;
-				$landData["assessed_value"] = $k->assessed_value;
-				$landData["or_number"] = $k->or_number;
-				$landData["or_date"] = $k->or_date;
-				$landData["payment"] = $k->due_total;
-				$landData["due_basic"] = $k->due_basic;
-				$landData["due_sef"] = $k->due_sef;
+				$clearancePaymentData = $this->Main_model->clearanceCompromise($where);
 			}
+			else{
+				$clearancePaymentData = $this->Main_model->clearancePayment($where);
+			}
+
+			$clearanceLandData = $this->Main_model->clearanceLandData($where);
+			$clearanceOwnerData = $this->Main_model->clearanceOwnerData($where);
+
 			
 
 		}
 		$data = [
-			"landData" => $landData,
-			"clearanceData" => $clearanceData,
+			"ownerData" => $clearanceOwnerData->result(),
+			"landData" => $clearanceLandData->result(),
+			"paymentData" => $clearancePaymentData->result(),
 			"purposeData" => $getData,
 		];
 
 		
-		echo json_encode($data);
+		// echo json_encode($data);	
 		$this->load->view("pages/clearanceshow", $data);
 
+	}
+
+
+	public function clearance_print()
+	{
+		$getData = [
+			"or_number" => clean_data(post("or_num")),
+			"request" => clean_data(post("request")),
+			"purpose" => clean_data(post("purpose")),
+			"tax_idd" => clean_data(post("tax_idd"))
+		];
+		$clearancePaymentData;
+		$clearanceLandData;
+		$clearanceOwnerData;
+
+		
+		$where = [
+			"tax_order.id" => $getData["tax_idd"],
+		];
+
+		$query = $this->Main_model->clearanceVerification($where);
+		$getClearance;
+		if($query->num_rows()){
+			foreach($query->result() as $k)
+			{
+				$getData["or_number"] = $k->or_number;
+				$getData["or_date"] = $k->or_date;
+				$getData["payment"] = $k->payment;
+				$getData["mode_of_payment"] = $k->mode_of_payment;
+			}
+
+			if($getData["mode_of_payment"] == "Compromise")
+			{
+				$clearancePaymentData = $this->Main_model->clearanceCompromise($where);
+			}
+			else{
+				$clearancePaymentData = $this->Main_model->clearancePayment($where);
+			}
+
+			$clearanceLandData = $this->Main_model->clearanceLandData($where);
+			$clearanceOwnerData = $this->Main_model->clearanceOwnerData($where);
+
+			
+
+		}
+		$data = [
+			"ownerData" => $clearanceOwnerData->result(),
+			"landData" => $clearanceLandData->result(),
+			"paymentData" => $clearancePaymentData->result(),
+			"purposeData" => $getData,
+		];
+
+		
+		// echo json_encode($data);	
+		$this->load->view("pages/clearanceprint", $data);
+
+	}
+
+	public function clearance_clear()
+	{
+		
 	}
 }

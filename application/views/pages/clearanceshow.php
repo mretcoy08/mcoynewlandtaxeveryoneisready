@@ -20,20 +20,20 @@ $pdf->setFillColor(0,0,0,0);
 
 
 
-$pin = $landData['pin'];
-$arp = $landData['tax_dec_no'];
-$location = $landData['barangay'];
-$assessed_value = $landData['assessed_value'];
-$or_number = $landData['or_number'];
-$date_of_payment = $landData['date_of_payment'];
-$amount_paid = $landData['payment'];
-$basic = $landData['due_basic'];
-$sef = $landData['due_sef'];
-$amount = $clearanceData['payment'];
+$pin = $landData[0]->pin;
+$arp = $landData[0]->tax_dec_no;
+$location = $landData[0]->barangay;
+$assessed_value = $landData[0]->assessed_value;
+$or_number = $paymentData[0]->or_number;
+$date_of_payment = $paymentData[0]->or_date;
+$amount_paid = showMoney($paymentData[0]->due_total);
+$basic = showMoney(Floatval($assessed_value)*.01);
+$sef = showMoney(Floatval($assessed_value)*.01);
+$amount = $purposeData['payment'];
 
-$certification_fee = $clearanceData['certification_fee'];
-$or_num = $clearanceData['or_number'];
-$clearancedate = $clearanceData['or_date'];
+$certification_fee = $purposeData['certification_fee'];
+$or_num = $purposeData['or_number'];
+$clearancedate = $purposeData['or_date'];
 
 
 
@@ -59,19 +59,19 @@ $request = $purposeData['request'];
 
 $pdf->Text(150,36,date("F d, Y"));
 
-$count = count($owner);
+$count = count($ownerData);
 // $pdf->setCellPaddings(2, 4, 6, 8);
 $txt ="";
 for($i=0;$i<$count;$i++){
 
-   $txt .= $owner[$i]['full_name'] .", ";
+   
+$txt .= $ownerData[$i]->full_name .", ";
 
 }
 
-
 $pdf->setCellPaddings(2, 2, 2, 8);
  $txt = ($txt == null ? '' : $txt);
-$pdf->MultiCell(65,20, $txt."\n", 0, 'L', 1, 1,128, 63, true, 0, false, true, 19, 'M', true);
+$pdf->MultiCell(55,20, $txt."\n", 0, 'L', 1, 1,130, 63, true, 0, false, true, 19, 'M', true);
 
 
 $day = date("d");

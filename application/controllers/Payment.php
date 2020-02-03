@@ -33,7 +33,7 @@ class Payment extends CI_Controller {
 			 "or_date" => clean_data(post("or_date")),
 		];
 
-		// $queryORID = $this->Main_model->insertWithId("or_pool",$orData);
+		$queryORID = $this->Main_model->insertWithId("or_pool",$orData);
 
 
 		$getData = [
@@ -46,7 +46,7 @@ class Payment extends CI_Controller {
 			 "due_discount" => saveMoney(clean_data(post("due_discount"))),
 			 "tax_year" => clean_data(post("tax_year")),
 			 "payment_status" => "PAID",
-			//  "or_pool_id" => $queryORID,
+			 "or_pool_id" => $queryORID,
 		];
 		$where = [
 			"id" => clean_data(post("payment_id")),
@@ -103,6 +103,20 @@ class Payment extends CI_Controller {
 
 
 		echo json_encode($balance." ".$due_discount." ".$due_penalty." ".$due_total." ".$sagot);
+	}
+
+	public function view_OR()
+	{
+		$where = [
+			"payment.id" => clean_data(post("id")),
+		];
+
+		  
+		$orData = $this->Main_model->getOrPayment($where);
+		$data['orData'] = $orData->result();
+
+		echo json_encode($data);
+		$this->load->view('pages/viewReceipt',$data);
 	}
 
 	public function payment_check()
@@ -315,9 +329,9 @@ class Payment extends CI_Controller {
 			$diff = monthDiff($getDueDate[0],$getDueDate[2]);
 			$penalty = penalty($nestedData["due_basic"],2,$diff);
 			$updateData = [
-				"due_penalty" => $penalty,
+				"due_penalty" => $penalty * 2,
 				"due_discount" => $discount,
-				"due_total" => ($nestedData["due_basic"] * 2) + $penalty - $discount,
+				"due_total" => ($nestedData["due_basic"] * 2) + ($penalty *2)- $discount,
 			];
 			$query = $this->Main_model->update("payment",$updateData,$whereIdPayment);
 		 }
@@ -326,8 +340,8 @@ class Payment extends CI_Controller {
 			$discount = discount($nestedData["due_basic"]);
 			$updateData = [
 				"due_penalty" => $penalty,
-				"due_discount" => $discount*(-1),
-				"due_total" => ($nestedData["due_basic"] * 2) + $penalty - ($discount * -1),
+				"due_discount" => $discount*(-2) ,
+				"due_total" => ($nestedData["due_basic"] * 2) + $penalty - ($discount * -2),
 			];
 			$query = $this->Main_model->update("payment",$updateData,$whereIdPayment);
 		 }
