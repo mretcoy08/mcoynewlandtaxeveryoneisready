@@ -40,8 +40,6 @@ function numtowords($x)
                         $digit21 = $digit2."".$digit1;
                         $numwords .= $oneto19[$digit21]." ";
                     break;  
-                      
-                       
                     }
                     else
                     {
@@ -49,23 +47,16 @@ function numtowords($x)
                         $whole_arr[$i] = $whole_arr[$i] - ($digit2 * 10);
                         $numwords .= $tens[$digit2]." ";
                     }
-                    // return $whole_arr[$i];
-                    
-                   
                 case "1": 
                     $digit1 = substr($whole_arr[$i],0,1);
                     $whole_arr[$i] = $whole_arr[$i] - ($digit1 * 1);
                     $numwords .= $oneto19[$digit1]." ";
                  
                 break;
-                
-                
             }
             $numwords .= $scale[$scaleCounter]." ";
             $scaleCounter--;
         }
-
-
         if($decnum > 0){
             $numwords .= " PESOS and ";
                 if($decnum < 20 ){
@@ -85,9 +76,10 @@ function numtowords($x)
                 }
                 $numwords .= ' '.'CENTS';
             }
-            else{
-             $numwords.' '.'PESOS';
-            }
+
+    else{
+        $numwords .= 'PESOS';
+    }
             
 
   

@@ -46,7 +46,7 @@ if($mode_of_payment != "Compromise"){
 
 
 
-$paymentwords = numtowords("1321816.09");
+$paymentwords = numtowords("3550819.05");
 
 if($mode_of_payment != "Compromise")
 {
