@@ -181,11 +181,32 @@ class Compromise extends CI_Controller {
 
 	}
 
-	public function view_receipt()
+	public function view_OR()
 	{
-		$data = "HELLO";
+		$where = [
+			"compromise.id" => clean_data(post("id")),
+		];
+
+		  
+		$orData = $this->Main_model->getOrCompromise($where);
+		$data['orData'] = $orData->result();
+
 		echo json_encode($data);
-		return $this->load->view('pages/viewReceipt',$data);
+		$this->load->view('pages/viewReceipt',$data);
+	}
+
+	public function print_OR()
+	{
+		$where = [
+			"compromise.id" => clean_data(post("id")),
+		];
+
+		  
+		$orData = $this->Main_model->getOrCompromise($where);
+		$data['orData'] = $orData->result();
+
+		echo json_encode($data);
+		$this->load->view('pages/printReceipt',$data);
 	}
 
 

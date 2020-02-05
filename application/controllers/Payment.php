@@ -112,12 +112,27 @@ class Payment extends CI_Controller {
 		];
 
 		  
-		$orData = $this->Main_model->getOrPayment($where);
+		$orData = $this->Main_model->getOrCompromise($where);
 		$data['orData'] = $orData->result();
 
 		echo json_encode($data);
 		$this->load->view('pages/viewReceipt',$data);
 	}
+
+	public function print_OR()
+	{
+		$where = [
+			"payment.id" => clean_data(post("id")),
+		];
+
+		  
+		$orData = $this->Main_model->getOrCompromise($where);
+		$data['orData'] = $orData->result();
+
+		echo json_encode($data);
+		$this->load->view('pages/printReceipt',$data);
+	}
+
 
 	public function payment_check()
 	{

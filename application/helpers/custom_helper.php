@@ -3,95 +3,100 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 // ------------------------------------------------------------------------
 
-function numberTowords($num)
+
+function numtowords($x)
 {
-$ones = array(
-0 =>"ZERO",
-1 => "ONE",
-2 => "TWO",
-3 => "THREE",
-4 => "FOUR",
-5 => "FIVE",
-6 => "SIX",
-7 => "SEVEN",
-8 => "EIGHT",
-9 => "NINE",
-10 => "TEN",
-11 => "ELEVEN",
-12 => "TWELVE",
-13 => "THIRTEEN",
-14 => "FOURTEEN",
-15 => "FIFTEEN",
-16 => "SIXTEEN",
-17 => "SEVENTEEN",
-18 => "EIGHTEEN",
-19 => "NINETEEN",
-014 => "FOURTEEN"
-);
-$tens = array( 
-0 => "ZERO",
-1 => "TEN",
-2 => "TWENTY",
-3 => "THIRTY", 
-4 => "FORTY", 
-5 => "FIFTY", 
-6 => "SIXTY", 
-7 => "SEVENTY", 
-8 => "EIGHTY", 
-9 => "NINETY" 
-); 
-$hundreds = array( 
-"HUNDRED", 
-"THOUSAND", 
-"MILLION", 
-"BILLION", 
-"TRILLION", 
-"QUARDRILLION" 
-); /*limit t quadrillion */
-$num = number_format($num,2,".",","); 
-$num_arr = explode(".",$num); 
-$wholenum = $num_arr[0]; 
-$decnum = $num_arr[1]; 
-$whole_arr = array_reverse(explode(",",$wholenum)); 
-krsort($whole_arr,1); 
-$rettxt = ""; 
-foreach($whole_arr as $key => $i){
-	
-while(substr($i,0,1)=="0")
-        $i=substr($i,1,5);
-        
-if($i < 20){ 
-/* echo "getting:".$i; */
-$rettxt .= $ones[$i]; 
-}elseif($i < 100){ 
-if(substr($i,0,1)!="0")  $rettxt .= $tens[substr($i,0,1)]; 
-if(substr($i,1,1)!="0") $rettxt .= " ".$ones[substr($i,1,1)]; 
-}else{ 
-if(substr($i,0,1)!="0") $rettxt .= $ones[substr($i,0,1)]." ".$hundreds[0]; 
-if(substr($i,1,1)!="0")$rettxt .= " ".$tens[substr($i,1,1)]; 
-if(substr($i,2,1)!="0")$rettxt .= " ".$ones[substr($i,2,1)]; 
-} 
-if($key > 0){ 
-$rettxt .= " ".$hundreds[$key]." "; 
-}
-} 
-if($decnum > 0){
-$rettxt .= " PESOS and ";
-if($decnum < 20){
-$rettxt .= $ones[$decnum];
-}elseif($decnum < 100){
-$rettxt .= $tens[substr($decnum,0,1)];
-$rettxt .= " ".$ones[substr($decnum,1,1)];
-$rettxt .= ' '.'CENTS';
-}
-}
-if($decnum > 0){
-    return $rettxt;
-}else{
-    return $rettxt.' '.'PESOS';
-}
+    $oneto19 = array("","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE","TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN");
+    $tens = array("","","TWENTY","THIRTY","FOURTY","FIFTY","SIXTY","SEVENTY","EIGHTY","NINETY");
+    $hundreds = array("","ONE HUNDRED","TWO HUNDRED","THREE HUNDRED", "FOUR HUNDRED", "FIVE HUNDRED", "SIX HUNDRED", "SEVEN HUNDRED" ,"EIGHT HUNDRED" ,"NINE HUNDRED");
+    $scale = array("","","THOUSAND", "MILLION");
+
+    $num = number_format($x,2,".",","); 
+    $num_arr = explode(".",$num); 
+
+    $numwords = "";
    
+        $wholenum = $num_arr[0]; 
+        $decnum = $num_arr[1]; 
+        $whole_arr = explode(",",$wholenum); 
+
+        $whole_count = count($whole_arr);
+        $scaleCounter = $whole_count;
+        for($i=0;$i<$whole_count;$i++)
+        {
+            $digitcount = strlen($whole_arr[$i]); 
+
+            switch($digitcount)
+            {
+                case "3": 
+                    $digit3 = substr($whole_arr[$i],0,1);
+                    $whole_arr[$i] = $whole_arr[$i] - ($digit3 * 100);
+                    $numwords .= "".$hundreds[$digit3]." ";
+                case "2":
+                    $digit2 = substr($whole_arr[$i],0,1);
+                    if($digit2 < 2)
+                    {
+                        $digit1 = substr($whole_arr[$i],1,1);
+                        $digit21 = $digit2."".$digit1;
+                        $numwords .= $oneto19[$digit21]." ";
+                    break;  
+                      
+                       
+                    }
+                    else
+                    {
+                        $digit2 = substr($whole_arr[$i],0,1);
+                        $whole_arr[$i] = $whole_arr[$i] - ($digit2 * 10);
+                        $numwords .= $tens[$digit2]." ";
+                    }
+                    // return $whole_arr[$i];
+                    
+                   
+                case "1": 
+                    $digit1 = substr($whole_arr[$i],0,1);
+                    $whole_arr[$i] = $whole_arr[$i] - ($digit1 * 1);
+                    $numwords .= $oneto19[$digit1]." ";
+                 
+                break;
+                
+                
+            }
+            $numwords .= $scale[$scaleCounter]." ";
+            $scaleCounter--;
+        }
+
+
+        if($decnum > 0){
+            $numwords .= " PESOS and ";
+                if($decnum < 20 ){
+                   
+                    if($decnum<10)
+                    {
+                       $decnum = str_replace(0,"",$decnum);
+                        $numwords .= $oneto19[$decnum];
+                    }
+                    else{
+                        $numwords .= $oneto19[$decnum];
+                    }
+                }elseif($decnum < 100){
+                    $numwords .= $tens[substr($decnum,0,1)];
+                    $numwords .= " ".$oneto19[substr($decnum,1,1)];
+                   
+                }
+                $numwords .= ' '.'CENTS';
+            }
+            else{
+             $numwords.' '.'PESOS';
+            }
+            
+
+  
+        return $numwords;
+       
+      
+    
 }
+
 
 if ( ! function_exists('monthDiff')) {
 

@@ -403,6 +403,19 @@ class Main_model extends CI_Model{
 						->get();
 		return $query;
 	}
+
+	public function getOrCompromise($where)
+	{
+		$query = $this->db->select("payor_name, barangay, tax_dec_no, basic, penalty, total, or_date, mode_of_payment, due_basic, payment_no, due_total, CONCAT(lo.first_name,' ',lo.middle_name,' ',lo.last_name) as ofull_name")
+						->from("compromise")
+						->join("or_pool", "or_pool.id = compromise.or_pool_id", "inner")
+						->join("tax_order", "tax_order.id = compromise.tax_order_id", "inner")
+						->join("land", "land.id = tax_order.land_id", "inner")
+						->join("land_owner lo", "lo.land_id = land.id", "inner")
+						->where($where)
+						->get();
+		return $query;
+	}
 	
 
 //END OF SELECT

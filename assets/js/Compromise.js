@@ -269,8 +269,11 @@ $(document).ready(function () {
 
 
 
+
+
 function paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year)
 {
+    $("#payment_idd").val(payment_id);
   $.ajax({
       type : 'POST',
       url : global.settings.url + 'Compromise/compromise_cash',
@@ -291,6 +294,69 @@ function paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,midd
       },
   });
 }
+
+$("#testbtn").click(function(){
+
+    view_OR(2);
+    $("#payment_idd").val(2);
+});
+
+function view_OR(id)
+  {
+      
+    $.ajax({
+        type : 'POST',
+        url : global.settings.url + 'Compromise/view_OR',
+        data: {id:id},
+        xhrFields: {	responseType: 'blob'},
+        success : function(data){
+            var url = window.URL.createObjectURL(data);
+            $('#myframe1').attr('src',url);
+            $("#recieptmodal1").modal("show");
+           
+        },
+    });
+  }
+
+  function printOR()
+  {
+    
+    var id = $("#payment_idd").val();
+    $.ajax({
+        type : 'POST',
+        url : global.settings.url + 'Compromise/print_OR',
+        data: {id:id},
+        xhrFields: {	responseType: 'blob'},
+        success : function(data){
+
+
+            Swal.fire({
+                title: 'Done Printing?',
+                text: "This is the only time you can re-print!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+              }).then((result) => {
+                if (result.value) {
+
+                  $("#payment_idd").val(""); 
+                 $("#recieptmodal1").modal("hide");
+                 $("#recieptmodal2").modal("hide");
+                }
+                else{
+                    $("#recieptmodal2").modal("hide");
+                }
+              })
+            var url = window.URL.createObjectURL(data);
+            $('#myframe2').attr('src',url);
+            $("#recieptmodal2").modal("show");
+            
+           
+        },
+    });
+  }
 
 
 

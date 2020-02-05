@@ -67,6 +67,7 @@
                     </div>
                     <!-- end content-->
                 </div>
+                <button class = "btn btn-danger btn-block" id = "testbtn">Testbtn</button>
                 <!--  end card  -->
             </div>
         </div>
@@ -489,7 +490,7 @@
 
 
 <!-- resibo modal -->
-<div class="modal fade" id="recieptmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="recieptmodal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
@@ -500,10 +501,10 @@
                         <div class="modal-body p-0">
                             <!-- src="<?php echo base_url()?>/pages/reciept#view=FitW&toolbar=0" -->
                             
-                            <iframe id="myframe" width='100%' height="450"></iframe>
+                            <iframe id="myframe1" width='100%' height="450"></iframe>
                         </div>
                         <div class="modal-footer">
-                            <button onclick="printmodalshow()" type="button" class="btn btn-sm btn-primary">Print</button>
+                            <button onclick="printOR()" type="button" class="btn btn-sm btn-primary">Print</button>
                             <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Close</button>
                         </div>
                     </div>
@@ -524,7 +525,7 @@
                         <div class="modal-body p-0">
                             <!-- src="<?php echo base_url()?>/pages/reciept#view=FitW&toolbar=0" -->
                             
-                            <iframe id="framedis" width='100%' height="450"></iframe>
+                            <iframe id="myframe2" width='100%' height="450"></iframe>
                         </div>
                         <div class="modal-footer">
                             <!-- <button onclick="printmodalshow()" type="button" class="btn btn-sm btn-primary">Print</button> -->

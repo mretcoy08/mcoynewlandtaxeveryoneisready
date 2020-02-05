@@ -60,7 +60,7 @@
                     </div>
                     <!-- end content-->
 
-                    <button class = "btn btn-danger btn-block" id = "testbtn">test btn</button>
+                    <!-- <button class = "btn btn-danger btn-block" id = "testbtn">test btn</button> -->
                 </div>
                 <!--  end card  -->
             </div>
@@ -489,11 +489,11 @@
                         </div>
                         <div class="modal-body p-0">
                             <!-- src="<?php echo base_url()?>/pages/reciept#view=FitW&toolbar=0" -->
-                            
-                            <iframe id="myframe" width='100%' height="450"></iframe>
+                            <input type="hidden" id = "payment_idd">
+                            <iframe id="myframe1" width='100%' height="450"></iframe>
                         </div>
                         <div class="modal-footer">
-                            <button onclick="printmodalshow()" type="button" class="btn btn-sm btn-primary">Print</button>
+                            <button onclick="printOR()" type="button" class="btn btn-sm btn-primary">Print</button>
                             <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Close</button>
                         </div>
                     </div>
@@ -514,7 +514,7 @@
                         <div class="modal-body p-0">
                             <!-- src="<?php echo base_url()?>/pages/reciept#view=FitW&toolbar=0" -->
                             
-                            <iframe id="framedis" width='100%' height="450"></iframe>
+                            <iframe id="myframe2" width='100%' height="450"></iframe>
                         </div>
                         <div class="modal-footer">
                             <!-- <button onclick="printmodalshow()" type="button" class="btn btn-sm btn-primary">Print</button> -->
