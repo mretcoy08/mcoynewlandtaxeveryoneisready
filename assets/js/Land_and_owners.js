@@ -41,11 +41,11 @@ $("#pin_barangay").change(function(){
     $.ajax({  
         url: global.settings.url + "Land_and_owners/getBarangayAndSubdivision",  
         method:'POST',   
+             
         data:{brgycode:brgycode}, 
         success:function(data)  
         {  
           
-          console.log(JSON.parse(data));
           var data = JSON.parse(data);
           console.log(data.subdivision);
           console.log(data.barangay[0].district_code);

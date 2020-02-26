@@ -67,7 +67,7 @@
                     </div>
                     <!-- end content-->
                 </div>
-                <button class = "btn btn-danger btn-block" id = "testbtn">Testbtn</button>
+                <!-- <button class = "btn btn-danger btn-block" id = "testbtn">Testbtn</button> -->
                 <!--  end card  -->
             </div>
         </div>
@@ -500,7 +500,7 @@
                         </div>
                         <div class="modal-body p-0">
                             <!-- src="<?php echo base_url()?>/pages/reciept#view=FitW&toolbar=0" -->
-                            
+                            <input type="hidden" id = "payment_idd">
                             <iframe id="myframe1" width='100%' height="450"></iframe>
                         </div>
                         <div class="modal-footer">

@@ -29,6 +29,10 @@ $(document).ready(function(){
         $('#h4user').text('Add User');
         $('#addbtn').text('Add User');
         $('#update_user').attr('id','add_user');
+        $('#first_name').attr("readonly",false);
+        $('#middle_name').attr("readonly",false);
+        $('#last_name').attr("readonly",false);
+        $('#username').attr("readonly",false);
         $('#add_user')[0].reset(); 
     });
 
@@ -121,6 +125,11 @@ $(document).ready(function(){
                     $('#role').attr('required',false);
                     $('#ddd').val(data.id);
                     $('#h4user').text('Update User');
+
+                    $('#first_name').attr("readonly",true);
+                    $('#middle_name').attr("readonly",true);
+                    $('#last_name').attr("readonly",true);
+                    $('#username').attr("readonly",true);
 
                     console.log(data);
                 

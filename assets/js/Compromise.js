@@ -135,21 +135,62 @@ $(document).ready(function () {
     var payment_id = $("#idd").val();
 
     var numbertowords = asd(due_total);
+
+    switch(payment_method)
+    {
+        case "cash":
+            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+
+        break;
+
+        case "check":
+            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+            $('#cash_payment').attr("hidden",true);
+            for(var i = 0; i< add_line.length;i++)
+            {
+                console.log(add_line[i]); 
+                $.ajax({
+                    type: "POST",
+                    data: add_line[i],
+                    url: global.settings.url +'Compromise/compromise_check',
+                    
+                    success: function(res){
+                        console.log(res);
+                    },
+                    error: function(res){
+                    
+                    }
+                });
+
+            }
+        break;
+
+        case "cashandcheck":
+            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+                for(var i = 0; i< add_line.length;i++)
+            { 
+                $.ajax({
+                    type: "POST",
+                    data: add_line[i],
+                    url: global.settings.url +'Compromise/compromise_check',
+                    
+                    success: function(res){
+                
+                    },
+                    error: function(res){
+                    
+                    }
+                });
+
+            }
+        break;
+    }
          
-    $.ajax({  
-        type: 'POST',  
-        url: global.settings.url + 'Compromise/view_receipt', 
-        data: {numbertowords:numbertowords,or_number:or_number,or_date:or_date,cash_rec:cash_rec,check_rec:check_rec,total_rec:total_rec,first_name:first_name,middle_name:middle_name,last_name:last_name,
-        due_total:due_total,balanace:balance,tax_year:tax_year},
-        xhrFields: {	responseType: 'blob'},
-        success: function(res) {
-            var url = window.URL.createObjectURL(res);
-            $('#myframe').attr('src',url);
-            $("#recieptmodal").modal("show");
-        },
-    });
+   
 
 });
+
+
 
   $("#printbtn").click(function(e){
     e.preventDefault();
@@ -157,7 +198,6 @@ $(document).ready(function () {
       return el != null;
     });  
 
-    //ERROR ON PAYMENT GETCASH BALANCE. QUESTION FOR CHANGE?? 
       var getcash = $("#cash_payment").val() == null ? 0 : $("#cash_payment").val();
       console.log("cash" +getcash);
       console.log("check" +total_cheque);
@@ -184,87 +224,13 @@ $(document).ready(function () {
     var payment_method = $('#payment_method').val();
     var payment_id = $("#idd").val();
 
-    var numbertowords = asd(due_total);
-      
-    $.ajax({  
-            type: 'POST',  
-            url: global.settings.url + 'Compromise/view_receipt', 
-            data: {numbertowords:numbertowords,or_number:or_number,or_date:or_date,cash_rec:cash_rec,check_rec:check_rec,total_rec:total_rec,first_name:first_name,middle_name:middle_name,last_name:last_name,
-            due_total:due_total,balanace:balance,tax_year:tax_year},
-            xhrFields: {	responseType: 'blob'},
-            success: function(res) {
-                var url = window.URL.createObjectURL(res);
-                $('#myframe').attr('src',url);
-                $("#recieptmodal").modal("show");
-                Swal.fire({
-                    title: 'Done Printing?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Done'
-                  }).then((result) => {
-                    if (result.value) {
+   
 
-                switch(payment_method)
-                    {
-                        case "cash":
-                            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
-
-                        break;
-
-                        case "check":
-                            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
-                            $('#cash_payment').attr("hidden",true);
-                            for(var i = 0; i< add_line.length;i++)
-                            {
-                                console.log(add_line[i]); 
-                                $.ajax({
-                                    type: "POST",
-                                    data: add_line[i],
-                                    url: global.settings.url +'Compromise/compromise_check',
-                                    
-                                    success: function(res){
-                                        console.log(res);
-                                    },
-                                    error: function(res){
-                                    
-                                    }
-                                });
-
-                            }
-                        break;
-
-                        case "cashandcheck":
-                            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
-                                for(var i = 0; i< add_line.length;i++)
-                            { 
-                                $.ajax({
-                                    type: "POST",
-                                    data: add_line[i],
-                                    url: global.settings.url +'Compromise/compromise_check',
-                                    
-                                    success: function(res){
-                                
-                                    },
-                                    error: function(res){
-                                    
-                                    }
-                                });
-
-                            }
-                        break;
-                    }
+          
                     
-                    }
-                },
-            );
-
-            
-            
-        },
-    });
+                    
+                
+        
 });
 
 
@@ -284,13 +250,15 @@ function paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,midd
           paymentHide(); 
           reset();
           $(".owners").remove();
+          view_OR(payment_id);
           $("#addCompromisePayment").modal("hide");
-          dataTable.ajax.reload();
-          Swal.fire(
-              'PAYMENT Successful!',
-              '',
-              'success'
-              )
+            dataTable.ajax.reload();
+              Swal.fire(
+                  'PAYMENT Successful!',
+                  '',
+                  'success'
+            )
+            
       },
   });
 }
@@ -358,6 +326,61 @@ function view_OR(id)
     });
   }
 
+function cancelOR(value){
+    var or_number = value;
+    console.log(or_number);
+
+    Swal.fire({
+        title: 'Admin Password',
+        input: 'password',
+        inputAttributes: {
+          autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        showLoaderOnConfirm: true,
+        preConfirm: (password) => {
+            $.ajax({
+                type : 'POST',
+                url : global.settings.url + 'Compromise/cancelOR_verification',
+                data:{password:password},  
+                dataType:"json",
+                success : function(data){
+                 
+                    if(data == "Success") {
+                        $.ajax({
+                            type : 'POST',
+                            url : global.settings.url + 'Compromise/cancelOR',
+                            data:{or_number:or_number},  
+                            dataType:"json",
+                            success : function(data){
+                                $("#viewPayment").modal("hide")
+                                dataTable.ajax.reload();
+                                console.log(data);
+                                    Swal.fire(
+                                    'O.R Cancelled!',
+                                    '',
+                                    'success'
+                                    )
+                            }
+                        })
+                        
+                    }
+                    else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: '',
+                            text: 'Wrong Admin Password',
+                            
+                          })
+                    }
+
+                }
+            })
+        },
+        
+      })
+}
 
 
 $("#add_cheque").click(function(e){

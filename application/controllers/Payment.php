@@ -112,7 +112,7 @@ class Payment extends CI_Controller {
 		];
 
 		  
-		$orData = $this->Main_model->getOrCompromise($where);
+		$orData = $this->Main_model->getOrPayment($where);
 		$data['orData'] = $orData->result();
 
 		echo json_encode($data);
@@ -126,7 +126,7 @@ class Payment extends CI_Controller {
 		];
 
 		  
-		$orData = $this->Main_model->getOrCompromise($where);
+		$orData = $this->Main_model->getOrPayment($where);
 		$data['orData'] = $orData->result();
 
 		echo json_encode($data);
@@ -217,27 +217,34 @@ class Payment extends CI_Controller {
 
 	public function cancelOR()
 	{
+		$cancelData = [];
 		$where = [
 			"or_number" => clean_data(post("or_number")),
 		];
-		$update = [
-			"payment_status" => "CANCEL",
-		];
-		$query = $this->Main_model->select("payment","*",$where);
-		$this->Main_model->update("payment",$update,$where);
-		$cancelData = [];
-		foreach($query->result() as $k)
+		$query = $this->Main_model->getCancelORPayment($where);
+		foreach($query as $k)
 		{
 			$cancelData = [
 				"due_basic" => $k->due_basic,
 				"due_sef" => $k->due_sef,
 				"payment_no" => $k->payment_no,
 				"due_date" => $k->due_date,
+				"start_date" => $k->start_date,
 				"tax_order_id" => $k->tax_order_id,
+				"payment_id" => $k->id,
 				"tax_year" => $k->tax_year,
-				"payment_status" => "PENDING",
 			];
 		}
+		$update = [
+			"payment_status" => "CANCEL",
+		];
+		
+		$cancelWhere = [
+			"id" => $cancelData["payment_id"],
+		];
+		$this->Main_model->update("payment",$update,$cancelWhere);
+		
+	
 		$whereTO = [
 			"id" => $cancelData["tax_order_id"],
 		];
@@ -247,8 +254,17 @@ class Payment extends CI_Controller {
 		{
 			$balance = $k->balance;
 		}
-		$this->Main_model->insert("payment",$cancelData);
-		$sumBalance = (Floatval($cancelData["due_basic"]) + Floatval($cancelData["due_sef"])) + Floatval($balance);
+		$newData = [
+			"due_basic" => $cancelData["due_basic"],
+			"due_sef" => $cancelData["due_sef"],
+			"payment_no" => $cancelData["payment_no"],
+			"due_date" => $cancelData["due_date"],
+			"start_date" => $cancelData["start_date"],
+			"tax_order_id" => $cancelData["tax_order_id"],
+			"tax_year" => $cancelData["tax_year"],
+		];
+		$this->Main_model->insert("payment",$newData);
+		$sumBalance = (Floatval($cancelData["due_basic"]) + Floatval($cancelData["due_sef"]));
 		$updateData = [
 			"balance" => $sumBalance,
 			"payment_status" => "PENDING",
@@ -281,21 +297,58 @@ class Payment extends CI_Controller {
 	{
 
 		$orData = [
-			"or_number" => clean_data(post("or_number")),
-			 "or_date" => clean_data(post("or_date")),
+			"or_number" => clean_data(post("clearance_ornumber")),
+			 "or_date" => date("Y-m-d"),
+			
 		];
 
 		$queryORID = $this->Main_model->insertWithId("or_pool",$orData);
 		$data = [
 			"land_id" => clean_data(post("land_id")),
 			"or_pool_id" => $queryORID,
+			"payor_name" => clean_data(post("payor_name")),
 			"payment" =>  saveMoney(clean_data(post("clearance_fee"))),
 			"print" => 1
 		];
 
 		$query = $this->Main_model->insert("tax_clearance_payment",$data);
 
+		echo json_encode($queryORID);
+	}
+
+	public function clearance_rview()
+	{
+		$where = [
+			"or_pool.id" => clean_data(post("or_id")),
+		];
+
+		$query = $this->Main_model->getClearanceOr($where);
+
+		$data = [
+			"clearance_or" => $query->result(),
+		];
+
 		echo json_encode($data);
+		
+		$this->load->view('pages/clearance_rec',$data);
+
+	}
+
+	public function clearance_rprint()
+	{
+		$where = [
+			"or_pool.id" => clean_data(post("id")),
+		];
+
+		$query = $this->Main_model->getClearanceOr($where);
+
+		$data = [
+			"clearance_or" => $query->result(),
+		];
+
+		echo json_encode($data);
+		
+		$this->load->view('pages/clearance_rec2',$data);
 	}
 	
 

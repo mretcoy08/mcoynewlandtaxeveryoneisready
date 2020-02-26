@@ -377,7 +377,7 @@ class Tax_order_assessment extends CI_Controller {
 							$basic[$counter] = $checkData["assessed_value"] * 0.01;
 							$year[$counter] = $checkData["last_paid_assessed"] +1;
 							$assessed_value[$counter] = $checkData["assessed_value"];
-							$diff = monthDiff(1,$year[$counter]);
+							$diff = monthDiff(date("m"),$year[$counter]);
 							$penalty[$counter] = 0;
 							$total[$counter] = 0;
 							if($diff >= 0)
@@ -711,7 +711,7 @@ class Tax_order_assessment extends CI_Controller {
 							$basic[$counter] = $checkData["assessed_value"] * 0.01;
 							$year[$counter] = $checkData["last_paid_assessed"] +1;
 							$assessed_value[$counter] = $checkData["assessed_value"];
-							$diff = monthDiff(1,$year[$counter]);
+							$diff = monthDiff(date("m"),$year[$counter]);
 							$penalty[$counter] = 0;
 							$total[$counter] = 0;
 							if($diff >= 0)
@@ -1047,7 +1047,7 @@ class Tax_order_assessment extends CI_Controller {
 							$basic[$counter] = $checkData["assessed_value"] * 0.01;
 							$year[$counter] = $checkData["last_paid_assessed"] +1;
 							$assessed_value[$counter] = $checkData["assessed_value"];
-							$diff = monthDiff(1,$year[$counter]);
+							$diff = monthDiff(date("m"),$year[$counter]);
 							$penalty[$counter] = 0;
 							$total[$counter] = 0;
 							if($diff >= 0)

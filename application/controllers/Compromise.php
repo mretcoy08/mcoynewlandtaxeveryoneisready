@@ -90,7 +90,7 @@ class Compromise extends CI_Controller {
 		$query = $this->Main_model->update($table,$updateData,$where);
 
 
-		echo json_encode($where);
+		echo json_encode($query);
     }
 
     public function compromise_check()
@@ -207,6 +207,95 @@ class Compromise extends CI_Controller {
 
 		echo json_encode($data);
 		$this->load->view('pages/printReceipt',$data);
+	}
+
+	public function cancelOR_verification()
+	{
+		$where = [
+			"password" => post("password"),
+		];
+		$query = $this->Main_model->select("user","role",$where);
+		$role = "";
+		if($query->num_rows()>0){
+			foreach($query->result() as $k)
+			{
+				$role = $k->role;
+			}
+		}
+		$data = "";
+		if($role)
+		{
+			if($role == "Admin" || $role == "Superadmin")
+			{
+				$data = "Success";
+			}
+			else{
+				$data = "Error";
+			}
+		}
+		echo json_encode($data);
+	}
+
+	public function cancelOR()
+	{
+		$cancelData = [];
+		$where = [
+			"or_number" => clean_data(post("or_number")),
+		];
+		$query = $this->Main_model->getCancelORComrpomise($where);
+		foreach($query as $k)
+		{
+			$cancelData = [
+				"due_basic" => $k->due_basic,
+				"due_sef" => $k->due_sef,
+				"payment_no" => $k->payment_no,
+				"tax_order_id" => $k->tax_order_id,
+				"compromise_id" => $k->id,
+				"tax_year" => $k->tax_year,
+			];
+		}
+		$update = [
+			"payment_status" => "CANCEL",
+		];
+		
+		$cancelWhere = [
+			"id" => $cancelData["compromise_id"],
+		];
+		$this->Main_model->update("compromise",$update,$cancelWhere);
+		
+	
+		$whereTO = [
+			"id" => $cancelData["tax_order_id"],
+		];
+		$query = $this->Main_model->select("tax_order","balance",$whereTO);
+		$balance;
+		foreach($query->result() as $k)
+		{
+			$balance = $k->balance;
+		}
+		$newData = [
+			"due_basic" => $cancelData["due_basic"],
+			"due_sef" => $cancelData["due_sef"],
+			"payment_no" => $cancelData["payment_no"],
+			"due_date" => $cancelData["due_date"],
+			"start_date" => $cancelData["start_date"],
+			"tax_order_id" => $cancelData["tax_order_id"],
+			"tax_year" => $cancelData["tax_year"],
+		];
+		$this->Main_model->insert("payment",$newData);
+		$sumBalance = (Floatval($cancelData["due_basic"]) + Floatval($cancelData["due_sef"]));
+		$updateData = [
+			"balance" => $sumBalance,
+			"payment_status" => "PENDING",
+		];
+		$whereData = [
+			"id" => $cancelData["tax_order_id"],
+		];
+		$this->Main_model->update("tax_order",$updateData,$whereData);
+	
+
+		echo json_encode($updateData);
+
 	}
 
 

@@ -416,6 +416,38 @@ class Main_model extends CI_Model{
 						->get();
 		return $query;
 	}
+
+	public function getClearanceOr($where)
+	{
+		$query = $this->db->select("payor_name,payment")
+						->from("or_pool")
+						->join("tax_clearance_payment as tcp", "or_pool.id = tcp.or_pool_id", "inner")
+						->where($where)
+						->get();
+		return $query;
+	}
+
+	public function getCancelORPayment($where)
+	{
+		$query = $this->db->select("start_date,due_date,due_basic,due_sef,tax_year, payment_no, tax_order_id,payment.id as id")
+						->from("or_pool")
+						->join("payment", "payment.or_pool_id = or_pool.id", "inner")
+						->where($where)
+						->get();
+
+		return $query->result();
+	}
+
+	public function getCancelORComrpomise($where)
+	{
+		$query =$this->db->select("due_basic, due_sef, due_total, tax_year, payment_no, tax_order_id, compromise.id")
+						->from("or_pool")
+						->join("compromise", "compromise.or_pool_id = or_pool.id", "inner")
+						->where($where)
+						->get();
+
+		return $query->result();
+	}
 	
 
 //END OF SELECT

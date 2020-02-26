@@ -99,12 +99,12 @@
                 </div>  
             </div>
 
-            <div class="col-md-6">
+            <!-- <div class="col-md-6">
                 <div class="form-group">
                     <label class = "bmd-label-floating">Suffix Name</label>
                     <input type="text" class="form-control" name="suffix_name" id="suffix_name">
                 </div>  
-            </div>
+            </div> -->
 
             <div class="col-md-6">
                 <div class="form-group">

@@ -183,6 +183,11 @@ $(document).ready(function () {
     });
   }
 
+  $("#testbtn").click(function(){
+
+    view_OR(2);
+    $("#payment_idd").val(2);
+});
 
   function view_OR(id)
   {
@@ -664,8 +669,18 @@ $("#clearance_payment").submit(function(e){
         success : function(data){
             console.log(data);
             $("#clearancePayment").modal("hide");
-            $("#clearance_ornumber").val("");
-            $("#clearance_fee").val("");
+            var or_id = data;
+            viewclearanceor(or_id);
+            $("#clearanceidd").val(or_id);
+            // $("#clearance_ornumber").val("");
+            // $("#clearance_fee").val("");
+
+
+            Swal.fire(
+                'PAYMENT Successful!',
+                '',
+                'success'
+                )
         },
         error:function(xhr){
             console.log(xhr);
@@ -673,6 +688,76 @@ $("#clearance_payment").submit(function(e){
     });
    
 });
+
+$("#clearancetestbtn").click(function(){
+
+    viewclearanceor(24);
+    $("#clearanceidd").val(24);
+});
+
+function viewclearanceor(x)
+{
+    var or_id = x;
+    
+    $.ajax({
+        type : 'POST',
+        url : global.settings.url + 'Payment/clearance_rview',
+        data:{or_id:or_id},
+        xhrFields: {	responseType: 'blob'},
+        success : function(data){
+            var url = window.URL.createObjectURL(data);
+            $('#myframe3').attr('src',url);
+            $("#clearancereceipt1").modal("show");
+        },
+        error: function(xhr)
+        {
+            console.log(xhr);
+        
+        }
+    });
+}
+
+function printmodalshow2()
+{
+    
+    var id = $("#clearanceidd").val();
+    $.ajax({
+        type : 'POST',
+        url : global.settings.url + 'Payment/clearance_rprint',
+        data: {id:id},
+        xhrFields: {	responseType: 'blob'},
+        success : function(data){
+
+
+            Swal.fire({
+                title: 'Done Printing?',
+                text: "This is the only time you can re-print!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+              }).then((result) => {
+                if (result.value) {
+
+                  $("#clearanceidd").val(""); 
+                 $("#clearancereceipt1").modal("hide");
+                 $("#clearancereceipt2").modal("hide");
+                }
+                else{
+                    $("#clearancereceipt2").modal("hide");
+                }
+              })
+            var url = window.URL.createObjectURL(data);
+            $('#myframe4').attr('src',url);
+            $("#clearancereceipt2").modal("show");
+            
+           
+        },
+    });
+  }
+
+
 
 $("#clearance_fee").change(function(){
     $("#clearance_fee").val(money($("#clearance_fee").val()? $("#clearance_fee").val():0));
@@ -694,6 +779,7 @@ $("#clearance_fee").change(function(){
                         if(data){
                             Swal.fire("O.R number already exist");
                             $("#or_number").val("");
+                            $(".ornum").val("");
                         }
 
                         // 

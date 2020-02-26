@@ -41,19 +41,16 @@
 					</li>';
 				}
 				?>	
-				
+					
 				<li>
-					<a href="#pageSubmenu" data-toggle="collapse" id="" class=" dropdown-toggle list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fa fa-university"></i> Tax Order</a>
-					<ul id="pageSubmenu" class="collapse list-unstyled">
-						<li>
-							<a href="<?php echo base_url()?>Land_and_owners" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fas fa-address-book"></i> Land and Owners</a>
-						</li>
-						<li>
-							<a href="<?php echo base_url()?>Tax_order_assessment" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fa fa-gavel"></i> Tax Order Assessment</a>
-						</li>
-					</ul>
+					<a href="<?php echo base_url()?>Land_and_owners" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fas fa-address-book"></i> Land and Owners</a>
 				</li>
-
+				<li>
+					<a href="<?php echo base_url()?>Building_and_owners" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fas fa-building"></i> Building and Owners</a>
+				</li>
+				<li>
+					<a href="<?php echo base_url()?>Tax_order_assessment" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fa fa-gavel"></i> Tax Order Assessment</a>
+				</li>
 				
 				<li>
 					<a href="<?php echo base_url()?>Payment" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fas fa-money-bill"></i> Payment</a>
@@ -64,9 +61,9 @@
 				<li>
 					<a href="<?php echo base_url()?>Clearance" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fas fa-file-alt "></i> Clearance</a>
 				</li>
-				<li>
+				<!-- <li>
 					<a href="<?php echo base_url()?>Audit_trail" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fas fa-clipboard-list "></i> Audit Trail</a>
-				</li>
+				</li> -->
 				<!-- END OF LIST -->
 			</ul>
 		</nav>

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 
 <?php 
@@ -132,11 +133,17 @@ input[type=number] {
                         $this->load->view('pages/land_and_owners');
                         break;
 
-                        case 'tax_order_assessment':
-                          $this->load->view('nav/sidenav',$segments_arr);
-                          echo '<div class="main-panel">';
-                          $this->load->view('pages/tax_order_assessment');
-                          break;
+                      case 'tax_order_assessment':
+                        $this->load->view('nav/sidenav',$segments_arr);
+                        echo '<div class="main-panel">';
+                        $this->load->view('pages/tax_order_assessment');
+                        break;
+
+                      case 'building_and_owners':
+                        $this->load->view('nav/sidenav',$segments_arr);
+                        echo '<div class="main-panel">';
+                        $this->load->view('pages/building_and_owners');
+                        break;
 
                       case 'clearance':
                         $this->load->view('nav/sidenav',$segments_arr);
@@ -149,11 +156,6 @@ input[type=number] {
                           echo '<div class="main-panel">';
                           $this->load->view('pages/audit_trail');
                           break;
-                    
-                    
-                   
-                        
-
 
                     default:
                         echo $segment2;

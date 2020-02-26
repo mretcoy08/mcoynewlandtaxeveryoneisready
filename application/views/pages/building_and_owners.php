@@ -3,7 +3,7 @@
 		<ol class="breadcrumb rgba-blue-grey-light py-3 ">
 			<li class="breadcrumb-item"><a href="<?php echo base_url() ?>/Dashboard"><i
 						class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-			<li class="breadcrumb-item active" aria-current="page">Land And Owner</li>
+			<li class="breadcrumb-item active" aria-current="page">Building And Owner</li>
 		
 		</ol>
 	</nav>
@@ -23,7 +23,7 @@
                             <div class="col-md-3">
                                 <div class="form-group" style="margin-top:10px;">
                                     <button type="button" class="btn btn-fill btn-primary" id = "add">
-                                        <i class="fa fa-plus"></i>&nbsp;Land and Owner</button>
+                                        <i class="fa fa-plus"></i>&nbsp;  Add Building and Owner</button>
                                 </div>   
                             </div>
                         
@@ -62,15 +62,15 @@
 
 
  <!-- The Modal -->      
-<div class="modal fade" id="addLandAndOwner">
+<div class="modal fade" id="addBuildingAndOwner">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
 
       <!-- Modal Header -->
       
       <div class="modal-header">
-       
-        <h4 class="modal-title text-primary text-center" id= "h4user">Land and Owner Information</h4>
+        
+        <h4 class="modal-title text-primary text-center" id= "h4user">Building and Owner Information</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
@@ -79,7 +79,7 @@
         <!-- Modal body -->
         <form id = "add_land_and_owner">
         <hr>
-        <h5 class = "text-center text-primary">Land Information</h5>
+        <h5 class = "text-center text-primary">Building Information</h5>
         <hr>
 
         <div class="row">
@@ -102,48 +102,36 @@
                 </div>
             </div>
         </div>
-        <strong><label for="">Pin No.</label></strong>
+
+     
+
       <div class="row">
-            <div class="col-md-1">
+            <div class="col-md-4">
                 <div class="form-group">
-                    <label class = "bmd-label-floating">City</label>
-                    <input type="number" class="form-control" name="pin_city" id="pin_city" value = "130" readonly>
+                    <label class = "bmd-label-floating">Land Pin No.</label>
+                    <input type="text" class="form-control" name="land_pin" id="land_pin">
+                </div>  
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class = "bmd-label-floating">Building No.</label>
+                    <input type="number" class="form-control new_input" name="building_no" id="building_no" required>
                 </div>  
             </div>
 
-            <div class="col-md-1">
+        <div class="col-md-3"></div>   
+        <div class="col-md-3">
                 <div class="form-group">
-                    <label class = "bmd-label-floating">District</label>
-                    <input type="number" class="form-control new_input" name="pin_district" id="pin_district" readonly>
-                </div>  
+                    <label for="" class="bmb-label-floating"  style = "color:red;">Assessed Value:</label>
+                    <input type="text" class = "form-control new_input money2" name = "assessed_value" id = "assessed_value" required>
+                </div>
             </div>
-
-            <div class="col-md-1">
-                <div class="form-group">
-                    <label class = "bmd-label-floating">Barangay</label>
-                    <input type="number" class="form-control new_input" name="pin_barangay" id="pin_barangay" required>
-                </div>  
-            </div>
-
-            <div class="col-md-1">
-                <div class="form-group">
-                    <label class = "bmd-label-floating">Section</label>
-                    <input type="number" class="form-control new_input" name="pin_section" id="pin_section" required>
-                </div>  
-            </div>
-
-            <div class="col-md-1">
-                <div class="form-group">
-                    <label class = "bmd-label-floating">Parcel</label>
-                    <input type="number" class="form-control new_input" name="pin_parcel" id="pin_parcel" required>
-                </div>  
-            </div>
-
-            <div class="col-md-3"></div>
             
             
         </div>
-
+        <hr>
+        <h5 class = "text-center text-primary">Land Information</h5>
+        <hr>
         <div class="row">
        
             
@@ -164,19 +152,19 @@
             <div class="col-md-2">
                 <div class="form-group">
                     <label class = bmb-label-floating>Lot No.</label>
-                    <input type="text" class = "form-control new_input" name = "lot_no" id = "lot_no">
+                    <input type="text" class = "form-control new_input" name = "lot_no" id = "lot_no" readonly>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
                     <label class = bmb-label-floating>Block No.</label>
-                    <input type="text" class = "form-control new_input" name = "block_no" id = "block_no">
+                    <input type="text" class = "form-control new_input" name = "block_no" id = "block_no" readonly>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
                     <label class = bmb-label-floating>Street</label>
-                    <input type="text" class = "form-control new_input" name = "street" id = "street">
+                    <input type="text" class = "form-control new_input" name = "street" id = "street" readonly>
                 </div>
             </div>
             
@@ -190,22 +178,16 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="" class="bmb-label-floating">Subdivision</label>
-                    <select name="subdivision" id="subdivision" class = "form-control new_input">
-                    <option value="">Select Subdivision</option>
-                    </select>
+                    <input type = "text" name="subdivision" id="subdivision" class = "form-control new_input" readonly>
+                   
                 </div>
             </div>
 
             <div class="col-md-2">
                 <div class="form-group">
                     <label for="" class="bmb-label-floating">Class</label>
-                    <select name="class" id="class" class = "form-control new_input" required>
-                        <option value="">Please Select a Class</option>
-                        <option value="RESIDENTIAL">RESIDENTIAL</option>
-                        <option value="COMMERCIAL">COMMERCIAL</option>
-                        <option value="AGRICULTURAL">AGRICULTURAL</option>
-                        <option value="INDUSTRIAL">INDUSTRIAL</option>
-                    </select>
+                    <input type = "text" name="class" id="class" class = "form-control new_input" readonly>
+                     
                 </div>
             </div>
 
@@ -225,11 +207,8 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="" class="bmb-label-floating">Land Status</label>
-                    <select name="land_status" id="land_status" class = "form-control new_input" required>
-                        <option value="">Please Select Status</option>
-                        <option value="TAXABLE">TAXABLE</option>
-                        <option value="EXEMPTED">EXEMPTED</option>
-                    </select>
+                    <input type = "text" name="land_status" id="land_status" class = "form-control new_input" readonly>
+                      
                 </div>
             </div>
 
@@ -237,7 +216,7 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="" class="bmb-label-floating">Assessed Value:</label>
-                    <input type="text" class = "form-control new_input money2" name = "assessed_value" id = "assessed_value" required>
+                    <input type="text" class = "form-control new_input money2" name = "assessed_value" id = "assessed_value" readonly>
                 </div>
             </div>
 
@@ -245,7 +224,7 @@
         </div>
 
         <hr>
-        <h5 class = "text-center text-primary">Owner Information</h5>
+        <h5 class = "text-center text-primary">Building Owner Information</h5>
         <hr>
 
         <div class="row">
@@ -409,18 +388,7 @@
                 </div>
             </div>
 
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="" class="bmb-label-floating">Class</label>
-                    <select name="class" id="upclass" class = "form-control new_input" required>
-                        <option value="">Please Select a Class</option>
-                        <option value="RESIDENTIAL">RESIDENTIAL</option>
-                        <option value="COMMERCIAL">COMMERCIAL</option>
-                        <option value="AGRICULTURAL">AGRICULTURAL</option>
-                        <option value="INDUSTRIAL">INDUSTRIAL</option>
-                    </select>
-                </div>
-            </div>
+           
 
             <div class="col-md-2">
                 <div class="form-group">
@@ -428,6 +396,7 @@
                     <input type="text" class = "form-control new_input" name = "sub_class" id = "upsub_class" readonly>
                 </div>
             </div>
+           
 
             <div class="col-md-2">
                

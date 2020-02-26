@@ -15,10 +15,10 @@ $orientation = $size['h'] > $size['w'] ? 'P' : 'L';
 $pdf->setPrintHeader(false);
 $pdf->setPrintFooter(false);
 $pdf->addPage($orientation);
-$pdf->useTemplate($tpl, null, null, 0, 0, TRUE);
+// $pdf->useTemplate($tpl, null, null, 0, 0, TRUE);
+
 $pdf->setFillColor(0,0,0,0);
-$pdf->addpage();
-$pdf->deletePage(1);
+
 
 // $ttl_amt_due = (int)$total_amnt_due; 
 // $ttl_amt_due = (int)$total_permit_fee; 
@@ -32,14 +32,14 @@ $pdf->deletePage(1);
 // $Amt = (int)$Amount;
 
 
-$clearance_fee = $clearance_fee;
-$clearance_numbertowords = $clearance_numbertowords;
+$clearance_fee = $clearance_or[0]->payment;
+$clearance_numbertowords =  numtowords($clearance_or[0]->payment);
 
 
 
 
 
-$min5 = 5;
+
 $pdf->Text(55,50  , date('Y-m-d'));
 
 $pdf->Text(17,58 , 'City Goverment of San Pablo');
@@ -48,10 +48,10 @@ $pdf->Text(17,58 , 'City Goverment of San Pablo');
 
 
 
-$pdf->Text(7,86  - $min5, 'Clearance Fee: ');
+$pdf->Text(7,82, 'Clearance Fee: ');
 $pdf->setCellPaddings(2, 4, 6, 8);
 $txt =($clearance_fee == null ? '0' : $clearance_fee);
-$pdf->MultiCell(40,7, $txt."\n", 0, 'R', 1, 1,60, 76, true, 0, false, true, 21, 'M', true);
+$pdf->MultiCell(40,7, $txt."\n", 1, 'R', 1, 1,60, 76, true, 0, false, true, 21, 'M', true);
 
 
 
@@ -86,7 +86,7 @@ $pdf->MultiCell(40,7, $txt."\n", 0, 'R', 1, 1,60, 76, true, 0, false, true, 21, 
 
 $pdf->setCellPaddings(2, 4, 6, 8);
 $txt = ($clearance_fee == null ? '0' : $clearance_fee);
-$pdf->MultiCell(40,7, $txt."\n", 0, 'R', 1, 1,60, 119, true, 0, false, true, 21, 'M', true);
+$pdf->MultiCell(40,7, $txt."\n", 1, 'R', 1, 1,60, 119, true, 0, false, true, 21, 'M', true);
 
   
 // $pdf->Text(7,$mode_payment == 'CASH' ? 139 : 145, 'x');

@@ -59,8 +59,8 @@
 
                     </div>
                     <!-- end content-->
-
-                    <button class = "btn btn-danger btn-block" id = "testbtn">test btn</button>
+                    <!-- <button class = "btn btn-danger btn-block" id = "testbtn">test btn</button> -->
+                    <!-- <button class = "btn btn-danger btn-block" id = "clearancetestbtn">test btn</button> -->
                 </div>
                 <!--  end card  -->
             </div>
@@ -435,7 +435,7 @@
 </div>
 
 
-<div class="modal fade" id="clearancereceipt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="clearancereceipt1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
@@ -445,8 +445,8 @@
                         </div>
                         <div class="modal-body p-0">
                             <!-- src="<?php echo base_url()?>/pages/reciept#view=FitW&toolbar=0" -->
-                            
-                            <iframe id="myframe2" width='100%' height="450"></iframe>
+                            <input type="text" id = "clearanceidd">
+                            <iframe id="myframe3" width='100%' height="450"></iframe>
                         </div>
                         <div class="modal-footer">
                             <button onclick="printmodalshow2()" type="button" class="btn btn-sm btn-primary">Print</button>
@@ -456,7 +456,7 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="clearancereceipt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="clearancereceipt2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
@@ -467,7 +467,7 @@
                         <div class="modal-body p-0">
                             <!-- src="<?php echo base_url()?>/pages/reciept#view=FitW&toolbar=0" -->
                             
-                            <iframe id="framedis2" width='100%' height="450"></iframe>
+                            <iframe id="myframe4" width='100%' height="450"></iframe>
                         </div>
                         <div class="modal-footer">
                             <!-- <button onclick="printmodalshow()" type="button" class="btn btn-sm btn-primary">Print</button> -->
@@ -673,10 +673,18 @@
                                     <!-- Modal body -->
                             <form id = "clearance_payment">
                                 <div class="row">
+
+                                    
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="payor_name">Payor Name:</label>
+                                            <input type="text" class = "form-control clearance_payment" id = "payor_name" name = "payor_name" required>
+                                        </div>
+                                    </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="clearance_ornumber">OR No:</label>
-                                            <input type="text" class = "form-control clearance_payment" id = "clearance_ornumber" name = "clearance_ornumber" required>
+                                            <input type="text" class = "form-control clearance_payment ornum" id = "clearance_ornumber" name = "clearance_ornumber" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">

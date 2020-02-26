@@ -44,7 +44,7 @@ class Land_and_owners extends CI_Controller {
 			"class" => clean_data(post("class")),
 			"sub_class" => clean_data(post("sub_class")),
 			"last_paid_assessed" => clean_data(post("last_year_paid")),
-			"assessed_value" => clean_data(post("assessed_value")),
+			"assessed_value" => saveMoney(clean_data(post("assessed_value"))),
 			"land_status" => clean_data(post("land_status")),
 		];
 		
@@ -75,6 +75,7 @@ class Land_and_owners extends CI_Controller {
 			"barangay" => $query_barangay->result(),
 			"subdivision" => $query_subdivision->result()
 		];
+		
 		echo json_encode($data);
 	}
 
@@ -96,7 +97,7 @@ class Land_and_owners extends CI_Controller {
 	public function getland()
 	{
 		$where = [
-			"id" => clean_data(post("id")),
+			"" => clean_data(post("id")),
 		];
 		$query = $this->Main_model->select("land","*",$where);
 
@@ -199,10 +200,9 @@ class Land_and_owners extends CI_Controller {
                 $nestedData['pin'] = $post->pin;
 				$nestedData['tax_dec_no'] = $post->tax_dec_no;
 				$nestedData['class'] = $post->class;
-				$nestedData['assessed_value'] = $post->assessed_value;
+				$nestedData['assessed_value'] = showMoney($post->assessed_value);
 				$nestedData['land_status'] = $post->land_status;
-				$nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'updbtn(".$post->id.")'>  <i class='fa fa-edit'></i></button>
-				<button class = ' btn btn-danger btn-sm ownerbtn' onclick = 'ownerbtn(".$post->id.")'>  <i class='fa fa-users'></i></button> ";
+				$nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'updbtn(".$post->id.")'>  <i class='fa fa-edit'></i></button>";
                 
                 $data[] = $nestedData;
             }

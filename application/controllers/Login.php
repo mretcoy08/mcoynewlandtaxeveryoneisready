@@ -7,7 +7,7 @@ class Login extends CI_Controller {
         parent::__construct();
 		date_default_timezone_set('Asia/Manila');
 		$this->load->model("Main_model");
-        // if(isset($this->session->id))
+        // if(isset($this->session->userdata()))
         // {
         //     redirect(base_url('Dashboard'));
         // }
