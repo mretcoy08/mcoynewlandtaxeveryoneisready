@@ -96,7 +96,7 @@ $("#add").click(function(e){
                 },
             });
            
-            console.log(data.tax_dec_no);
+            console.log(data.assessed_value);
 
             $("#barangay").val(data.barangay);
             $("#lot_no").val(data.lot_no);
@@ -109,8 +109,7 @@ $("#add").click(function(e){
             $("#class").val(data.class);
             $("#sub_class").val(data.sub_class);
             $("#land_status").val(data.land_status);
-            $("#assessed_value").val(data.assessed_value);
-
+            $("#assessed_value").val(money(data.assessed_value));
             $(".flood_subd").remove();
             $("#subdivision").append(html_subdivision);
           

@@ -119,11 +119,12 @@
                 </div>  
             </div>
 
-        <div class="col-md-3"></div>   
+        <div class="col-md-3"></div>  
+
         <div class="col-md-3">
                 <div class="form-group">
                     <label for="" class="bmb-label-floating"  style = "color:red;">Assessed Value:</label>
-                    <input type="text" class = "form-control new_input money2" name = "assessed_value" id = "assessed_value" required>
+                    <input type="text" class = "form-control new_input money2" name = "building_assessed_value" id = "building_assessed_value" required>
                 </div>
             </div>
             
@@ -216,7 +217,7 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="" class="bmb-label-floating">Assessed Value:</label>
-                    <input type="text" class = "form-control new_input money2" name = "assessed_value" id = "assessed_value" readonly>
+                    <input type="text" class = "form-control new_input" name = "assessed_value" id = "assessed_value" readonly>
                 </div>
             </div>
 
