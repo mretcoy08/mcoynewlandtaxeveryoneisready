@@ -16,14 +16,13 @@ class Tax_order_assessment extends CI_Controller {
             redirect(base_url('Login'));
         }
     }
-	
-	
+
 	public function index()
 	{
 		$this->load->view('template/template');
 	}
 
-	public function assessment()
+	public function land_assessment()
 	{
 	
 		$where = [
@@ -54,11 +53,45 @@ class Tax_order_assessment extends CI_Controller {
 
        $data['full_name'] = $query2->result();
         echo json_encode($data);
+  }
+  
+  public function building_assessment()
+	{
+	
+		$where = [
+			'building.id' => clean_data(post('id'))
+		];
+		$where_owner = [
+			'building_id' => clean_data(post('id')),
+		];
+        $table1 = "building";
+        $table2 = "building_owner";
+
+        $select1 = "CONCAT(pin_city, '-', pin_district, '-', pin_barangay, '-',pin_section, '-', pin_parcel,'-',building_pin) as pin, building.tax_dec_no, barangay, building.assessed_value, building_status, building.id, building.last_paid_assessed";
+        $select2 = "CONCAT(first_name, ' ', middle_name, ' ', last_name) AS full_name";
+        
+        $query1 = $this->Main_model->selectbuildingland($table1,$select1,$where);
+        $query2 = $this->Main_model->select($table2,$select2,$where_owner);
+        $data = [];
+        foreach($query1->result() as $k){
+            $data['pin'] = $k->pin;
+            $data['location'] = $k->barangay;
+            $data['arp_no'] = $k->tax_dec_no;
+            $data['land_faas_id'] = $k->id;
+            $data['assessed_value'] = $k->assessed_value;
+            $data['status_of_tax'] = $k->building_status;
+            // $data['assess_effectivity'] = $k->year_assessed;
+            $data['last_paid_assessed'] = $k->last_paid_assessed;
+        }
+
+       $data['full_name'] = $query2->result();
+        echo json_encode($data);
 	}
 	public function assessment_table()
 	{
 
-		$assessment_search = clean_data(post("assessment_search"));
+    $assessment_search = clean_data(post("assessment_search"));
+    $searchType = clean_data(post("searchType"));
 
 		$columns = array( 
 			0 =>'first_name', 
@@ -77,50 +110,88 @@ class Tax_order_assessment extends CI_Controller {
 			//DATATABLE VARIABLES
 
 			//END OF DATATABLE VARIABLES
+       if($searchType == "Land"){
+        $totalData = $this->Main_model->all_post_count_toa1($assessment_search);
 
-			$totalData = $this->Main_model->all_post_count_toa($assessment_search);
+        $totalFiltered = $totalData; 
+  
+        if(empty($this->input->post('search')['value']))
+        {            
+        $posts = $this->Main_model->all_post_toa1($limit,$start,$order,$dir,$assessment_search);
+        }
+        else {
+        $posts =  $this->Main_model->post_search_toa1($limit,$start,$search,$order,$dir,$assessment_search);
+        $totalFiltered = $this->Main_model->post_search_count_toa1($search,$assessment_search);
+        }
+        $data = array();
+        if(!empty($posts))
+        {
+        foreach ($posts as $post)
+        {
+        $nestedData['owner'] = $post->full_name;
+        $nestedData['location'] = $post->barangay;
+        $nestedData['pin'] = $post->pin;
+        $nestedData['tax_dec_no'] = $post->tax_dec_no;
+        $nestedData['action'] = "<button class = ' btn btn-success btn-sm blah' onclick= 'assesst(".$post->id.")'><i class='fa fa-edit'></i></button>";
+  
+        $data[] = $nestedData;
+        }
+        }
+  
+        $json_data = array(
+          "draw"            => intval($this->input->post('draw')),  
+          "recordsTotal"    => intval($totalData),  
+          "recordsFiltered" => intval($totalFiltered), 
+          "data"            => $data, 
+          );
+          
+        echo json_encode($json_data); 
+       }
+       else if($searchType == "Building")
+       {
+        $totalData = $this->Main_model->all_post_count_toa2($assessment_search);
 
-			$totalFiltered = $totalData; 
-
-			if(empty($this->input->post('search')['value']))
-			{            
-			$posts = $this->Main_model->all_post_toa($limit,$start,$order,$dir,$assessment_search);
-			}
-			else {
-			$posts =  $this->Main_model->post_search_toa($limit,$start,$search,$order,$dir,$assessment_search);
-			$totalFiltered = $this->Main_model->post_search_count_toa($search,$assessment_search);
-			}
-			$data = array();
-			if(!empty($posts))
-			{
-			foreach ($posts as $post)
-			{
-			$nestedData['owner'] = $post->full_name;
-			$nestedData['location'] = $post->barangay;
-			$nestedData['pin'] = $post->pin;
-			$nestedData['tax_dec_no'] = $post->tax_dec_no;
-			$nestedData['action'] = "<button class = ' btn btn-success btn-sm blah' onclick= 'assesst(".$post->id.")'><i class='fa fa-edit'></i></button>";
-
-			$data[] = $nestedData;
-			}
-			}
-
-			$json_data = array(
-				"draw"            => intval($this->input->post('draw')),  
-				"recordsTotal"    => intval($totalData),  
-				"recordsFiltered" => intval($totalFiltered), 
-				"data"            => $data, 
-				"test" => $assessment_search
-				);
-				
-			echo json_encode($json_data); 
+        $totalFiltered = $totalData; 
+  
+        if(empty($this->input->post('search')['value']))
+        {            
+        $posts = $this->Main_model->all_post_toa2($limit,$start,$order,$dir,$assessment_search);
+        }
+        else {
+        $posts =  $this->Main_model->post_search_toa2($limit,$start,$search,$order,$dir,$assessment_search);
+        $totalFiltered = $this->Main_model->post_search_count_toa2($search,$assessment_search);
+        }
+        $data = array();
+        if(!empty($posts))
+        {
+        foreach ($posts as $post)
+        {
+        $nestedData['owner'] = $post->full_name;
+        $nestedData['location'] = $post->barangay;
+        $nestedData['pin'] = $post->pin;
+        $nestedData['tax_dec_no'] = $post->tax_dec_no;
+        $nestedData['action'] = "<button class = ' btn btn-success btn-sm blah' onclick= 'assesst(".$post->id.")'><i class='fa fa-edit'></i></button>";
+  
+        $data[] = $nestedData;
+        }
+        }
+  
+        $json_data = array(
+          "draw"            => intval($this->input->post('draw')),  
+          "recordsTotal"    => intval($totalData),  
+          "recordsFiltered" => intval($totalFiltered), 
+          "data"            => $data, 
+          );
+          
+        echo json_encode($json_data); 
+       }
+		
 			}
 
 	public function print_taxOrder(){
 
-		
-		
 				$getData = [
+          "taxData" => clean_data(post("taxData")),
 					"id" => clean_data(post("id")),
 					"mode_of_payment" => clean_data(post("mode_of_payment")),
 					"year_of_effectivity" => clean_data(post("year_of_effectivity")),
@@ -138,40 +209,112 @@ class Tax_order_assessment extends CI_Controller {
 					"number_of_payment" => clean_data(post("number_of_payment")),
 					"down_payment" => saveMoney(clean_data(post("down_payment"))),
 				];
-				$checkWhere = [
+				$checkWhereLand = [
 					"land_id" => $getData["id"],
 					"year_assessed" => date("Y"),
+        ];
+        
+        $checkWhereBuilding = [
+					"building_id" => $getData["id"],
+					"year_assessed" => date("Y"),
 				];
-				$checkQuery = $this->Main_model->select("tax_order","*",$checkWhere);
-				$data = "";
-				if($checkQuery->num_rows() > 0)
+        $checkQuery1 = $this->Main_model->select("tax_order","*",$checkWhereLand);
+        $checkQuery2 = $this->Main_model->select("tax_order","*",$checkWhereBuilding);
+        $data = "";
+        $insertData = [];
+				if($checkQuery1->num_rows() > 0)
 				{
-					$data = "MERON NA!";
-				}
-				else{
-						$basic1 = $getData["mop1"];
+          
+          if($checkQuery2->num_rows() > 0)
+          {
+            $data = "MERON NA!";
+          }
+          else{
+            $basic1 = $getData["mop1"];
 						$basic2 = $getData["mop2"];
 						$basic3 = $getData["mop3"];
 						$basic4 = $getData["mop4"];
-						
+       
+              if($getData['taxData'] == "Land")
+              {
+                $insertData = [
+                  "basic" => $getData["total_basic"],
+                  "sef" =>  $getData["total_basic"],
+                  "penalty" =>  $getData["total_penalty"],
+                  "discount" =>  Floatval($getData["total_discount"]) *(-1),
+                  "total" => $getData["total_fee"],
+                  "balance" => $getData["total_fee"],
+                  "mode_of_payment" => $getData["mode_of_payment"],
+                  "year_assessed" => date("Y"),
+                  "year_of_effectivity" => $getData["year_of_effectivity"],
+                  "payment_status" => "PENDING",
+                  "land_id" => $getData["id"]
+                ];
+              }
+              else if($getData['taxData'] == "Building")
+              {
+                $insertData = [
+                  "basic" => $getData["total_basic"],
+                  "sef" =>  $getData["total_basic"],
+                  "penalty" =>  $getData["total_penalty"],
+                  "discount" =>  Floatval($getData["total_discount"]) *(-1),
+                  "total" => $getData["total_fee"],
+                  "balance" => $getData["total_fee"],
+                  "mode_of_payment" => $getData["mode_of_payment"],
+                  "year_assessed" => date("Y"),
+                  "year_of_effectivity" => $getData["year_of_effectivity"],
+                  "payment_status" => "PENDING",
+                  "building_id" => $getData["id"]
+                ];
+              }
+          }
+        }
+        else if($checkQuery2->num_rows() > 0)
+        {
+          $data = "MERON NA!";
+        }
+        else{
+          $basic1 = $getData["mop1"];
+          $basic2 = $getData["mop2"];
+          $basic3 = $getData["mop3"];
+          $basic4 = $getData["mop4"];
+     
+            if($getData['taxData'] == "Land")
+            {
+                  $insertData = [
+                    "basic" => $getData["total_basic"],
+                    "sef" =>  $getData["total_basic"],
+                    "penalty" =>  $getData["total_penalty"],
+                    "discount" =>  Floatval($getData["total_discount"]) *(-1),
+                    "total" => $getData["total_fee"],
+                    "balance" => $getData["total_fee"],
+                    "mode_of_payment" => $getData["mode_of_payment"],
+                    "year_assessed" => date("Y"),
+                    "year_of_effectivity" => $getData["year_of_effectivity"],
+                    "payment_status" => "PENDING",
+                    "land_id" => $getData["id"]
+                  ];
+              }
+              else if($getData['taxData'] == "Building")
+              {
+                  $insertData = [
+                    "basic" => $getData["total_basic"],
+                    "sef" =>  $getData["total_basic"],
+                    "penalty" =>  $getData["total_penalty"],
+                    "discount" =>  Floatval($getData["total_discount"]) *(-1),
+                    "total" => $getData["total_fee"],
+                    "balance" => $getData["total_fee"],
+                    "mode_of_payment" => $getData["mode_of_payment"],
+                    "year_assessed" => date("Y"),
+                    "year_of_effectivity" => $getData["year_of_effectivity"],
+                    "payment_status" => "PENDING",
+                    "building_id" => $getData["id"]
+                  ];
+              }
+        }
+
+	
 					
-						
-						
-						
-						$insertData = [
-							"basic" => $getData["total_basic"],
-							"sef" =>  $getData["total_basic"],
-							"penalty" =>  $getData["total_penalty"],
-							"discount" =>  Floatval($getData["total_discount"]) *(-1),
-							"total" => $getData["total_fee"],
-							"balance" => $getData["total_fee"],
-							"mode_of_payment" => $getData["mode_of_payment"],
-							"year_assessed" => date("Y"),
-							"year_of_effectivity" => $getData["year_of_effectivity"],
-							"payment_status" => "PENDING",
-							"land_id" => $getData["id"]
-						];
-						
 						
 						$query = $this->Main_model->insertWithId("tax_order",$insertData);
 
@@ -233,33 +376,7 @@ class Tax_order_assessment extends CI_Controller {
 							break;
 
 							case "Compromise": 
-								// $dm = date("m");
-								// $dm = Intval($dm) + Intval($getData["number_of_payment"]);
-								// $dmonth = ((Intval(date("m"))) + Intval($getData{"number_of_payment"}));
-								// $dyear = 0;
-								// if($dmonth > 12)
-								// {	$pyear = (Intval(date("m")) + Intval($getData{"number_of_payment"})) % 12;
-								// 	$dyear = (Intval($getData["number_of_payment"]) / 12) + Intval(date("Y")) + $pyear;
-								// 	$dmonth = ((Intval(date("m"))) + (Intval($getData{"number_of_payment"}) % 12));
-								// }
-								// else{
-								// 	$dmonth = ((Intval(date("m"))) + Intval($getData{"number_of_payment"}));
-								// 	$pyear = 0;
-								// 	$dyear = (Intval($getData["number_of_payment"]) / 12) + Intval(date("Y")) + $pyear;
-								// }
 								
-								
-								// $insertDataPayment = [
-									
-								// 	// "due_basic" => $basic1/2,
-								// 	// "due_sef" => $basic1/2,
-								// 	"due_discount" => 0,
-								// 	"due_penalty" => 0,
-								// 	// "due_total" => $basic1,
-								// 	"tax_year"  =>  $getData["year_of_effectivity"],
-								// 	"payment_no" => $i+1,
-								// 	"tax_order_id" => $query,
-								// ];
 								$payment = array($getData["down_payment"]);
 								for($i=0;$i<=$getData["number_of_payment"];$i++)
 								{
@@ -277,16 +394,13 @@ class Tax_order_assessment extends CI_Controller {
 								}
 							break;
 						}
-				}
+	
+            echo json_encode($getData);
+      }
+      
+    
 
-				
-				
-			
-					echo json_encode($insertData);
-				
-			}
-
-			
+    
 
 
 
@@ -295,38 +409,67 @@ class Tax_order_assessment extends CI_Controller {
 				$id = clean_data(post("id"));
 				$mode_of_payment = clean_data(post("mode_of_payment"));
 				$year_of_effectivity = clean_data(post("year_of_effectivity"));
-				
-				$data =[];
-				$getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+        $taxData = clean_data(post("taxData"));
+        $data =[];
 				$nestedData = [];
 				$basic = [];
 				$year = [];
 				$assessed_value = [];
 				$penalty = [];
 				$total = [];
-				$checkData = [];
+        $checkData = [];
+
+        $queryGetLastPayment = "";
+        if($taxData == "Land")
+        {
+          $getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+				
+          foreach($getOwnerLocation as $k)
+          {
+            $nestedData['full_name'] = $k->full_name;
+            $nestedData['barangay'] = $k->barangay;
+            $nestedData['tax_dec_no'] = $k->tax_dec_no;
+      
+          }
+          $data['ownerLocation'] = $nestedData;
+          $queryGetLastPayment = $this->Main_model->getLastPayment($id);
+          $queryGetYearLastPayment = $this->Main_model->getYearLastPayment($id);
+          foreach($queryGetYearLastPayment as $k){
+              $checkData = [
+                "last_paid_assessed" => $k->last_paid_assessed,
+                "assessed_value" => $k->assessed_value,
+                "land_status"=> $k->land_status
+              ];
+            }
+        }
+        else if($taxData == "Building")
+        {
+          $getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+				
+          foreach($getOwnerLocation as $k)
+          {
+            $nestedData['full_name'] = $k->full_name;
+            $nestedData['barangay'] = $k->barangay;
+            $nestedData['tax_dec_no'] = $k->tax_dec_no;
+      
+          }
+          $data['ownerLocation'] = $nestedData;
+          $queryGetLastPayment = $this->Main_model->getBuildingLastPayment($id);
+          $queryGetYearLastPayment = $this->Main_model->getBuildingYearLastPayment($id);
+          foreach($queryGetYearLastPayment as $k){
+              $checkData = [
+                "last_paid_assessed" => $k->last_paid_assessed,
+                "assessed_value" => $k->assessed_value,
+                "land_status"=> $k->building_status
+              ];
+            }
+        }
 				// $upbasic = [];
 				// $upyear = [];
 				// $upassessed_value = [];
 				// $uppenalty = [];
 				// $uptotal = [];
-				foreach($getOwnerLocation as $k)
-				{
-					$nestedData['full_name'] = $k->full_name;
-					$nestedData['barangay'] = $k->barangay;
-					$nestedData['tax_dec_no'] = $k->tax_dec_no;
-		
-				}
-				$data['ownerLocation'] = $nestedData;
-				$queryGetLastPayment = $this->Main_model->getLastPayment($id);
-				$queryGetYearLastPayment = $this->Main_model->getYearLastPayment($id);
-				foreach($queryGetYearLastPayment as $k){
-						$checkData = [
-							"last_paid_assessed" => $k->last_paid_assessed,
-							"assessed_value" => $k->assessed_value,
-							"land_status"=> $k->land_status
-						];
-					}
+        
 				// PAYMENT
 				if($queryGetLastPayment == "noPayment"){
 					$data['check'] = "penaltyWithOutBalanceInQSA";
@@ -349,8 +492,16 @@ class Tax_order_assessment extends CI_Controller {
 							$total[$counter] = 0;
 							if($diff >= 0)
 							{
-								$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-								$total[$counter] = $basic[$counter] + $penalty[$counter];
+								if($diff > 3)
+                {
+                  $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+                else 
+                {
+                  $penalty[$counter]= 0;
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
 							}
 							else{
 								$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -382,8 +533,17 @@ class Tax_order_assessment extends CI_Controller {
 							$total[$counter] = 0;
 							if($diff >= 0)
 							{
-								$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-								$total[$counter] = $basic[$counter] + $penalty[$counter];
+                if($diff > 3)
+                {
+                  $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+                else 
+                {
+                  $penalty[$counter]= 0;
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+								
 							}
 							else{
 								$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -428,8 +588,16 @@ class Tax_order_assessment extends CI_Controller {
 								$total[$counter] = 0;
 								if($diff >= 0)
 								{
-									$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-									$total[$counter] = $basic[$counter] + $penalty[$counter];
+                    if($diff > 3)
+                  {
+                    $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                    $total[$counter] = $basic[$counter] + $penalty[$counter];
+                  }
+                  else 
+                  {
+                    $penalty[$counter]= 0;
+                    $total[$counter] = $basic[$counter] + $penalty[$counter];
+                  }
 								}
 								else{
 									$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -457,8 +625,16 @@ class Tax_order_assessment extends CI_Controller {
 										$total[$counter] = 0;
 										if($diff >= 0)
 										{
-											$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-											$total[$counter] = $basic[$counter] + $penalty[$counter];
+                      if($diff > 3)
+                      {
+                        $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
+                      else 
+                      {
+                        $penalty[$counter]= 0;
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
 										}
 										else{
 											$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -497,8 +673,16 @@ class Tax_order_assessment extends CI_Controller {
 											$total[$counter] = 0;
 											if($diff >= 0)
 											{
-												$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-												$total[$counter] = $basic[$counter] + $penalty[$counter];
+                        if($diff > 3)
+                        {
+                          $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
+                        else 
+                        {
+                          $penalty[$counter]= 0;
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
 											}
 											else{
 												$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -528,8 +712,16 @@ class Tax_order_assessment extends CI_Controller {
 										$total[$counter] = 0;
 										if($diff >= 0)
 										{
-											$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-											$total[$counter] = $basic[$counter] + $penalty[$counter];
+                      if($diff > 3)
+                      {
+                        $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
+                      else 
+                      {
+                        $penalty[$counter]= 0;
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
 										}
 										else{
 											$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -596,8 +788,16 @@ class Tax_order_assessment extends CI_Controller {
 											$total[$counter] = 0;
 											if($diff >= 0)
 											{
-												$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-												$total[$counter] = $basic[$counter] + $penalty[$counter];
+                        if($diff > 3)
+                        {
+                          $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
+                        else 
+                        {
+                          $penalty[$counter]= 0;
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
 											}
 											else{
 												$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -624,42 +824,71 @@ class Tax_order_assessment extends CI_Controller {
 			}
 
 			public function viewprint(){
-		
-				$id = clean_data(post("id"));
+
+        $id = clean_data(post("id"));
 				$mode_of_payment = clean_data(post("mode_of_payment"));
 				$year_of_effectivity = clean_data(post("year_of_effectivity"));
-				
-				$data =[];
-				$getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+        $taxData = clean_data(post("taxData"));
+        $data =[];
 				$nestedData = [];
 				$basic = [];
 				$year = [];
 				$assessed_value = [];
 				$penalty = [];
 				$total = [];
-				$checkData = [];
+        $checkData = [];
+
+        $queryGetLastPayment = "";
+        if($taxData == "Land")
+        {
+          $getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+				
+          foreach($getOwnerLocation as $k)
+          {
+            $nestedData['full_name'] = $k->full_name;
+            $nestedData['barangay'] = $k->barangay;
+            $nestedData['tax_dec_no'] = $k->tax_dec_no;
+      
+          }
+          $data['ownerLocation'] = $nestedData;
+          $queryGetLastPayment = $this->Main_model->getLastPayment($id);
+          $queryGetYearLastPayment = $this->Main_model->getYearLastPayment($id);
+          foreach($queryGetYearLastPayment as $k){
+              $checkData = [
+                "last_paid_assessed" => $k->last_paid_assessed,
+                "assessed_value" => $k->assessed_value,
+                "land_status"=> $k->land_status
+              ];
+            }
+        }
+        else if($taxData == "Building")
+        {
+          $getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+				
+          foreach($getOwnerLocation as $k)
+          {
+            $nestedData['full_name'] = $k->full_name;
+            $nestedData['barangay'] = $k->barangay;
+            $nestedData['tax_dec_no'] = $k->tax_dec_no;
+      
+          }
+          $data['ownerLocation'] = $nestedData;
+          $queryGetLastPayment = $this->Main_model->getBuildingLastPayment($id);
+          $queryGetYearLastPayment = $this->Main_model->getBuildingYearLastPayment($id);
+          foreach($queryGetYearLastPayment as $k){
+              $checkData = [
+                "last_paid_assessed" => $k->last_paid_assessed,
+                "assessed_value" => $k->assessed_value,
+                "land_status"=> $k->building_status
+              ];
+            }
+        }
 				// $upbasic = [];
 				// $upyear = [];
 				// $upassessed_value = [];
 				// $uppenalty = [];
 				// $uptotal = [];
-				foreach($getOwnerLocation as $k)
-				{
-					$nestedData['full_name'] = $k->full_name;
-					$nestedData['barangay'] = $k->barangay;
-					$nestedData['tax_dec_no'] = $k->tax_dec_no;
-		
-				}
-				$data['ownerLocation'] = $nestedData;
-				$queryGetLastPayment = $this->Main_model->getLastPayment($id);
-				$queryGetYearLastPayment = $this->Main_model->getYearLastPayment($id);
-				foreach($queryGetYearLastPayment as $k){
-						$checkData = [
-							"last_paid_assessed" => $k->last_paid_assessed,
-							"assessed_value" => $k->assessed_value,
-							"land_status"=> $k->land_status
-						];
-					}
+        
 				// PAYMENT
 				if($queryGetLastPayment == "noPayment"){
 					$data['check'] = "penaltyWithOutBalanceInQSA";
@@ -682,8 +911,16 @@ class Tax_order_assessment extends CI_Controller {
 							$total[$counter] = 0;
 							if($diff >= 0)
 							{
-								$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-								$total[$counter] = $basic[$counter] + $penalty[$counter];
+								if($diff > 3)
+                {
+                  $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+                else 
+                {
+                  $penalty[$counter]= 0;
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
 							}
 							else{
 								$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -703,7 +940,6 @@ class Tax_order_assessment extends CI_Controller {
 					
 					//ELSE WLANG UTANG
 					else{
-						
 						$counter = 0;
 						for($checkData["last_paid_assessed"];$checkData["last_paid_assessed"]<=$year_of_effectivity-1;$checkData["last_paid_assessed"]++)
 						{
@@ -716,8 +952,17 @@ class Tax_order_assessment extends CI_Controller {
 							$total[$counter] = 0;
 							if($diff >= 0)
 							{
-								$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-								$total[$counter] = $basic[$counter] + $penalty[$counter];
+                if($diff > 3)
+                {
+                  $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+                else 
+                {
+                  $penalty[$counter]= 0;
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+								
 							}
 							else{
 								$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -762,8 +1007,16 @@ class Tax_order_assessment extends CI_Controller {
 								$total[$counter] = 0;
 								if($diff >= 0)
 								{
-									$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-									$total[$counter] = $basic[$counter] + $penalty[$counter];
+                    if($diff > 3)
+                  {
+                    $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                    $total[$counter] = $basic[$counter] + $penalty[$counter];
+                  }
+                  else 
+                  {
+                    $penalty[$counter]= 0;
+                    $total[$counter] = $basic[$counter] + $penalty[$counter];
+                  }
 								}
 								else{
 									$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -791,8 +1044,16 @@ class Tax_order_assessment extends CI_Controller {
 										$total[$counter] = 0;
 										if($diff >= 0)
 										{
-											$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-											$total[$counter] = $basic[$counter] + $penalty[$counter];
+                      if($diff > 3)
+                      {
+                        $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
+                      else 
+                      {
+                        $penalty[$counter]= 0;
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
 										}
 										else{
 											$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -831,8 +1092,16 @@ class Tax_order_assessment extends CI_Controller {
 											$total[$counter] = 0;
 											if($diff >= 0)
 											{
-												$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-												$total[$counter] = $basic[$counter] + $penalty[$counter];
+                        if($diff > 3)
+                        {
+                          $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
+                        else 
+                        {
+                          $penalty[$counter]= 0;
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
 											}
 											else{
 												$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -862,8 +1131,16 @@ class Tax_order_assessment extends CI_Controller {
 										$total[$counter] = 0;
 										if($diff >= 0)
 										{
-											$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-											$total[$counter] = $basic[$counter] + $penalty[$counter];
+                      if($diff > 3)
+                      {
+                        $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
+                      else 
+                      {
+                        $penalty[$counter]= 0;
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
 										}
 										else{
 											$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -930,8 +1207,16 @@ class Tax_order_assessment extends CI_Controller {
 											$total[$counter] = 0;
 											if($diff >= 0)
 											{
-												$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-												$total[$counter] = $basic[$counter] + $penalty[$counter];
+                        if($diff > 3)
+                        {
+                          $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
+                        else 
+                        {
+                          $penalty[$counter]= 0;
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
 											}
 											else{
 												$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -960,42 +1245,70 @@ class Tax_order_assessment extends CI_Controller {
 		
 
 			public function printTO(){
-		
-				$id = clean_data(post("id"));
+        $id = clean_data(post("id"));
 				$mode_of_payment = clean_data(post("mode_of_payment"));
 				$year_of_effectivity = clean_data(post("year_of_effectivity"));
-				
-				$data =[];
-				$getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+        $taxData = clean_data(post("taxData"));
+        $data =[];
 				$nestedData = [];
 				$basic = [];
 				$year = [];
 				$assessed_value = [];
 				$penalty = [];
 				$total = [];
-				$checkData = [];
+        $checkData = [];
+
+        $queryGetLastPayment = "";
+        if($taxData == "Land")
+        {
+          $getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+				
+          foreach($getOwnerLocation as $k)
+          {
+            $nestedData['full_name'] = $k->full_name;
+            $nestedData['barangay'] = $k->barangay;
+            $nestedData['tax_dec_no'] = $k->tax_dec_no;
+      
+          }
+          $data['ownerLocation'] = $nestedData;
+          $queryGetLastPayment = $this->Main_model->getLastPayment($id);
+          $queryGetYearLastPayment = $this->Main_model->getYearLastPayment($id);
+          foreach($queryGetYearLastPayment as $k){
+              $checkData = [
+                "last_paid_assessed" => $k->last_paid_assessed,
+                "assessed_value" => $k->assessed_value,
+                "land_status"=> $k->land_status
+              ];
+            }
+        }
+        else if($taxData == "Building")
+        {
+          $getOwnerLocation = $this->Main_model->getOwnerLocation($id);
+				
+          foreach($getOwnerLocation as $k)
+          {
+            $nestedData['full_name'] = $k->full_name;
+            $nestedData['barangay'] = $k->barangay;
+            $nestedData['tax_dec_no'] = $k->tax_dec_no;
+      
+          }
+          $data['ownerLocation'] = $nestedData;
+          $queryGetLastPayment = $this->Main_model->getBuildingLastPayment($id);
+          $queryGetYearLastPayment = $this->Main_model->getBuildingYearLastPayment($id);
+          foreach($queryGetYearLastPayment as $k){
+              $checkData = [
+                "last_paid_assessed" => $k->last_paid_assessed,
+                "assessed_value" => $k->assessed_value,
+                "land_status"=> $k->building_status
+              ];
+            }
+        }
 				// $upbasic = [];
 				// $upyear = [];
 				// $upassessed_value = [];
 				// $uppenalty = [];
 				// $uptotal = [];
-				foreach($getOwnerLocation as $k)
-				{
-					$nestedData['full_name'] = $k->full_name;
-					$nestedData['barangay'] = $k->barangay;
-					$nestedData['tax_dec_no'] = $k->tax_dec_no;
-		
-				}
-				$data['ownerLocation'] = $nestedData;
-				$queryGetLastPayment = $this->Main_model->getLastPayment($id);
-				$queryGetYearLastPayment = $this->Main_model->getYearLastPayment($id);
-				foreach($queryGetYearLastPayment as $k){
-						$checkData = [
-							"last_paid_assessed" => $k->last_paid_assessed,
-							"assessed_value" => $k->assessed_value,
-							"land_status"=> $k->land_status
-						];
-					}
+        
 				// PAYMENT
 				if($queryGetLastPayment == "noPayment"){
 					$data['check'] = "penaltyWithOutBalanceInQSA";
@@ -1005,7 +1318,7 @@ class Tax_order_assessment extends CI_Controller {
 					//IF MAY UTANG
 					if(Date("Y") - $checkData['last_paid_assessed'] > 1)
 					{
-						$data['check'] = "roblox";
+					
 						$counter = 0;
 						for($checkData["last_paid_assessed"];$checkData["last_paid_assessed"]<=$year_of_effectivity-1;$checkData["last_paid_assessed"]++)
 						{
@@ -1018,8 +1331,16 @@ class Tax_order_assessment extends CI_Controller {
 							$total[$counter] = 0;
 							if($diff >= 0)
 							{
-								$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-								$total[$counter] = $basic[$counter] + $penalty[$counter];
+								if($diff > 3)
+                {
+                  $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+                else 
+                {
+                  $penalty[$counter]= 0;
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
 							}
 							else{
 								$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -1042,7 +1363,6 @@ class Tax_order_assessment extends CI_Controller {
 						$counter = 0;
 						for($checkData["last_paid_assessed"];$checkData["last_paid_assessed"]<=$year_of_effectivity-1;$checkData["last_paid_assessed"]++)
 						{
-							$data['check'] = "asd";
 							$data['check'] = "penaltyWithOutBalance";
 							$basic[$counter] = $checkData["assessed_value"] * 0.01;
 							$year[$counter] = $checkData["last_paid_assessed"] +1;
@@ -1052,8 +1372,17 @@ class Tax_order_assessment extends CI_Controller {
 							$total[$counter] = 0;
 							if($diff >= 0)
 							{
-								$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-								$total[$counter] = $basic[$counter] + $penalty[$counter];
+                if($diff > 3)
+                {
+                  $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+                else 
+                {
+                  $penalty[$counter]= 0;
+                  $total[$counter] = $basic[$counter] + $penalty[$counter];
+                }
+								
 							}
 							else{
 								$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -1098,8 +1427,16 @@ class Tax_order_assessment extends CI_Controller {
 								$total[$counter] = 0;
 								if($diff >= 0)
 								{
-									$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-									$total[$counter] = $basic[$counter] + $penalty[$counter];
+                    if($diff > 3)
+                  {
+                    $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                    $total[$counter] = $basic[$counter] + $penalty[$counter];
+                  }
+                  else 
+                  {
+                    $penalty[$counter]= 0;
+                    $total[$counter] = $basic[$counter] + $penalty[$counter];
+                  }
 								}
 								else{
 									$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -1127,8 +1464,16 @@ class Tax_order_assessment extends CI_Controller {
 										$total[$counter] = 0;
 										if($diff >= 0)
 										{
-											$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-											$total[$counter] = $basic[$counter] + $penalty[$counter];
+                      if($diff > 3)
+                      {
+                        $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
+                      else 
+                      {
+                        $penalty[$counter]= 0;
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
 										}
 										else{
 											$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -1167,8 +1512,16 @@ class Tax_order_assessment extends CI_Controller {
 											$total[$counter] = 0;
 											if($diff >= 0)
 											{
-												$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-												$total[$counter] = $basic[$counter] + $penalty[$counter];
+                        if($diff > 3)
+                        {
+                          $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
+                        else 
+                        {
+                          $penalty[$counter]= 0;
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
 											}
 											else{
 												$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -1198,8 +1551,16 @@ class Tax_order_assessment extends CI_Controller {
 										$total[$counter] = 0;
 										if($diff >= 0)
 										{
-											$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-											$total[$counter] = $basic[$counter] + $penalty[$counter];
+                      if($diff > 3)
+                      {
+                        $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
+                      else 
+                      {
+                        $penalty[$counter]= 0;
+                        $total[$counter] = $basic[$counter] + $penalty[$counter];
+                      }
 										}
 										else{
 											$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -1266,8 +1627,16 @@ class Tax_order_assessment extends CI_Controller {
 											$total[$counter] = 0;
 											if($diff >= 0)
 											{
-												$penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
-												$total[$counter] = $basic[$counter] + $penalty[$counter];
+                        if($diff > 3)
+                        {
+                          $penalty[$counter]= penalty($checkData["assessed_value"]*.01,2,$diff);
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
+                        else 
+                        {
+                          $penalty[$counter]= 0;
+                          $total[$counter] = $basic[$counter] + $penalty[$counter];
+                        }
 											}
 											else{
 												$penalty[$counter]= discount($checkData["assessed_value"]*.01);
@@ -1291,7 +1660,16 @@ class Tax_order_assessment extends CI_Controller {
 				}
 				echo json_encode($data);
 				return $this->load->view('pages/taxorder_print',$data);
-			}
+      }
+      
+
+
+      
+  public function testtest()
+  {
+		// echo json_encode('tanginamo');
+    $this->load->view('pages/taxorder_view');
+  }
 		
 			
 			

@@ -7,6 +7,7 @@ hide_element();
 advYear("year_of_effectivity");
 $("#compromise").hide();
 
+
 //END OF DOCUMENT READY
 });
 
@@ -21,19 +22,21 @@ function hide_element()
 
 
 
-function assessment_table(search)
+
+
+function assessment_table(search,searchType)
 {   
 
     
     var assessment_search = search;
-
+    
         dataTable = $('#posts').DataTable({
             "processing": true,
             "serverSide": true,
             "bFilter": false,
             "ajax":{
              "url": global.settings.url + "Tax_order_assessment/assessment_table",
-             "data":{assessment_search:assessment_search},
+             "data":{assessment_search:assessment_search,searchType:searchType},
              "dataType": "json",
              "type": "POST",
             
@@ -53,11 +56,30 @@ function assessment_table(search)
     });
 }
 
+$("#taxData").change(function(){
+  var data = $(this).val();
+  
+  if(data == "")
+  {
+      $("#assessment_search_btn").attr("disabled", true);
+      $("#assessment_search").attr("disabled", true);
+      var search = "asdqwezxc123";
+      $('#posts').DataTable().clear().destroy();
+      assessment_table(search);
+  }
+  else
+  {
+  
+    $("#assessment_search_btn").attr("disabled", false);
+      $("#assessment_search").attr("disabled", false);
+  }
+
+});
 
 
 $("#assessment_search_btn").click(function(e){
     e.preventDefault();
-   
+    var searchType = $("#taxData").val();
     // var check = $("#assessment_search").val();
     // $("#posts").dataTable().fnDestroy();
     var search = $("#assessment_search").val();
@@ -71,7 +93,7 @@ $("#assessment_search_btn").click(function(e){
         // $('#posts').DataTable().fnClearTable();
       
         $('#posts').DataTable().clear().destroy();
-        assessment_table(search);
+        assessment_table(search,searchType);
     // }
     
 
@@ -80,13 +102,17 @@ $("#assessment_search_btn").click(function(e){
 function assesst(val)
 {   $('#assessment_search').val("");
     $('#posts').DataTable().clear().destroy();
-   
+    var searchType  = $("#taxData").val();
     var id = val;
     console.log(val);
     $("#payment_info").show();
-    $.ajax({
+
+    if(searchType == "Land")
+    {
+     
+      $.ajax({
         type : 'POST',
-        url : global.settings.url + 'tax_order_assessment/assessment',
+        url : global.settings.url + 'tax_order_assessment/land_assessment',
         data:{id: id},
         dataType:"json",
         success : function(data){
@@ -120,12 +146,56 @@ function assesst(val)
             console.log('mali');
         },
         });
+    }
+    else if(searchType == "Building")
+    {
+      
+      $.ajax({
+        type : 'POST',
+        url : global.settings.url + 'tax_order_assessment/building_assessment',
+        data:{id: id},
+        dataType:"json",
+        success : function(data){
+            console.log(data);
+          var basic = parseFloat(data.assessed_value) * .01;
+            var subtotal = basic * 2;
+            var html_owner ="";
+            
+            $("#idd").val(id);
+            $("#pin").val(data.pin);
+            $("#arp").val(data.arp_no);
+            $("#location").val(data.location);
+            $("#status_of_tax").val(data.status_of_tax);
+            $("#last_paid_assessed").val(data.last_paid_assessed);
+            
+            console.log(data.assessed_value);
+            
+            $("#assessed_value").val(money(data.assessed_value));
+            
+           
+            $.each(data['full_name'], function( index, value ) {
+               html_owner += "<input class = 'form-control payment paymentowners' type = 'text' value = '" +value['full_name']+"' disabled/>";
+              });
+              $('.paymentowners').remove();
+              $("#owners").append(html_owner);
+
+
+        },
+        error:function(){
+            console.log('mali');
+        },
+        });
+    }
+
+   
 }
 
 $("#viewTaxOrder").click(function(e){
     e.preventDefault();
    var id = $("#idd").val();
    var mode_of_payment = $("#mode_of_payment").val();
+   var taxData = $("#taxData").val();
+   var requestor = $("#requestor").val();
    var last_paid_year = $("#last_paid_assessed").val();
     var assessed_value = $("#assessed_value").val();
     var basic_fee = $("#basic_fee").val();
@@ -140,22 +210,14 @@ $("#viewTaxOrder").click(function(e){
     $.ajax({  
         type: 'POST',  
         url : global.settings.url + 'Tax_order_assessment/viewprint',
-        data:{id:id, mode_of_payment:mode_of_payment,year_of_effectivity:year_of_effectivity},
+        data:{requestor:requestor,taxData:taxData,id:id, mode_of_payment:mode_of_payment,year_of_effectivity:year_of_effectivity},
         xhrFields: {
             responseType: 'blob'
         },
         success: function(res) {
             var url = window.URL.createObjectURL(res);
             $('#taxorder').attr('src',url);
-            // $.ajax({
-            //             type : 'POST',
-            //             url : global.settings.url + 'Tax_order_assessment/print_taxOrder',
-            //             data:{id:id, mode_of_payment:mode_of_payment,last_paid_year:last_paid_year,assessed_value:assessed_value,basic_fee:basic_fee,total_fee:total_fee},
-            //             dataType:"json",
-            //             success: function(res) {
-                            
-            //             },
-            //         });
+           
         },
         error: function(xhr){
             xhr.responseText()
@@ -171,6 +233,7 @@ $("#print").click(function(e){
    var mode_of_payment = $("#mode_of_payment").val();
    var last_paid_year = $("#last_paid_assessed").val();
     var assessed_value = $("#assessed_value").val();
+    var taxData = $("#taxData").val();
     var basic_fee = $("#basic_fee").val();
     var total_fee = $("#total_fee").val(); 
     var mop1 = $("#mop1").val();
@@ -183,13 +246,13 @@ $("#print").click(function(e){
     var year_of_effectivity = $('#year_of_effectivity').val();
     var number_of_payment = $("#number_of_payment").val();
     var down_payment = $("#down_payment").val();
-    console.log(basic_total);
+    console.log(taxData);
     console.log(penalty_total);    
 
     $.ajax({  
         type: 'POST',  
         url : global.settings.url + 'Tax_order_assessment/printTO',
-        data:{id:id, mode_of_payment:mode_of_payment,year_of_effectivity:year_of_effectivity},
+        data:{taxData:taxData,id:id, mode_of_payment:mode_of_payment,year_of_effectivity:year_of_effectivity},
         xhrFields: {
             responseType: 'blob'
         },
@@ -206,11 +269,11 @@ $("#print").click(function(e){
                 confirmButtonText: 'Yes!'
               }).then((result) => {
                 if (result.value) {
-
+                      alert(taxData);
                     $.ajax({
                         type : 'POST',
                         url : global.settings.url + 'Tax_order_assessment/print_taxOrder',
-                        data:{down_payment:down_payment,number_of_payment:number_of_payment,discount_total:discount_total,year_of_effectivity:year_of_effectivity,basic_total:basic_total,penalty_total:penalty_total,mop1:mop1,mop2:mop2,mop3:mop3,mop4:mop4,id:id, mode_of_payment:mode_of_payment,last_paid_year:last_paid_year,assessed_value:assessed_value,basic_fee:basic_fee,total_fee:total_fee},
+                        data:{taxData:taxData,down_payment:down_payment,number_of_payment:number_of_payment,discount_total:discount_total,year_of_effectivity:year_of_effectivity,basic_total:basic_total,penalty_total:penalty_total,mop1:mop1,mop2:mop2,mop3:mop3,mop4:mop4,id:id, mode_of_payment:mode_of_payment,last_paid_year:last_paid_year,assessed_value:assessed_value,basic_fee:basic_fee,total_fee:total_fee},
                         dataType:"json",
                         success: function(data) {
                             console.log(data);
@@ -244,13 +307,14 @@ $("#compute").click(function(e){
    var mode_of_payment = $("#mode_of_payment").val();
    var compromise = $("#number_of_payment").val();
    var year_of_effectivity = $('#year_of_effectivity').val();
+   var taxData = $('#taxData').val();
    $(".rowrow").remove();
 
    $("#real_tax_order_of_payment").show();
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Tax_order_assessment/compute',
-        data:{id:id, mode_of_payment:mode_of_payment,year_of_effectivity:year_of_effectivity},
+        data:{taxData:taxData,id:id, mode_of_payment:mode_of_payment,year_of_effectivity:year_of_effectivity},
         dataType:"json",
         success : function(data){
             console.log(data);
@@ -465,6 +529,9 @@ $("#mode_of_payment").change(function(){
     }
 
 });
+
+
+
 
 
 

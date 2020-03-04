@@ -180,7 +180,18 @@ class Main_model extends CI_Model{
 				->get();
 
 		return $query->result();
-	}
+  }
+  
+  public function getBuildingOwnerLocation($where)
+  {
+    $query = $this->db->select("barangay,CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, building.tax_dec_no")
+                      ->from("building")
+                      ->join("land", "building.land_id = land.id ", "inner")
+                      ->where("building.id", $where)
+                      ->limit(1)
+                      ->get();
+      return $query->result();
+  }
 
 	public function getLastPayment($id)
 	{
@@ -200,6 +211,26 @@ class Main_model extends CI_Model{
 		else{
 			return "noPayment";
 		}			
+  }
+  
+  public function getBuildingLastPayment($id)
+	{
+		$query = $this->db->select("payment.id, payment_no, due_basic,tax_year,tax_order.mode_of_payment")
+							->from("payment")
+							->join("tax_order","tax_order.id = payment.tax_order_id","inner")
+							->where("tax_order.building_id",$id)
+							->where("payment.payment_status", "PENDING")
+							->order_by("payment.id", "DESC")
+							->limit(1)
+							->get();
+		
+		if($query->num_rows())
+		{
+			return $query->result();
+		}	
+		else{
+			return "noPayment";
+		}			
 	}
 
 	public function getYearLastPayment($id)
@@ -207,6 +238,17 @@ class Main_model extends CI_Model{
 		$query = $this->db->select("last_paid_assessed,assessed_value,land_status")
 						->from("land")
 						->where("land.id", $id)
+						->order_by("id","DESC")
+						->limit(1)
+						->get();
+		return $query->result();
+  }
+  
+  public function getBuildingYearLastPayment($id)
+	{
+		$query = $this->db->select("last_paid_assessed,assessed_value,building_status")
+						->from("building")
+						->where("building.id", $id)
 						->order_by("id","DESC")
 						->limit(1)
 						->get();
@@ -447,7 +489,18 @@ class Main_model extends CI_Model{
 						->get();
 
 		return $query->result();
-	}
+  }
+  
+  public function selectbuildingland($table,$select,$where)
+  {
+    $query = $this->db->select($select)
+                      ->from($table)
+                      ->join("land", "land.id = building.land_id", "inner")
+                      ->where($where)
+                      ->get();
+
+    return $query;
+  }
 	
 
 //END OF SELECT
@@ -612,7 +665,7 @@ function all_post_count($table,$data,$where)
 
 
 		//DATA TABLES FOR TAX ORDER ASSESSMENT
-		function all_post_count_toa($assessment_search)
+		function all_post_count_toa1($assessment_search)
 		{   
 			$yearDate = date("Y");
 		$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no,land.id")
@@ -627,7 +680,7 @@ function all_post_count($table,$data,$where)
 
 		}
 
-		function all_post_toa($limit,$start,$col,$dir,$assessment_search)
+		function all_post_toa1($limit,$start,$col,$dir,$assessment_search)
 		{   
 			$yearDate = date("Y");
 			$query =$this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, tax_dec_no, land.id")
@@ -646,7 +699,48 @@ function all_post_count($table,$data,$where)
 				return null;
 			}
 			
+    }
+    
+
+    function all_post_count_toa2($assessment_search)
+		{   
+			$yearDate = date("Y");
+      $query =$this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,'-',building_pin) as pin, building.tax_dec_no, building.id")
+					->from("building")
+          ->join("building_owner","building_owner.building_id = building.id", "inner")
+          ->join("land","land.id = building.land_id", "inner")
+					->where("building.last_payment_assessed <",$yearDate)
+					->or_where("building.last_payment_assessed", null)
+					->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,'-',building_pin,' ',building.tax_dec_no)",$assessment_search)
+					
+					->get();
+			return $query->num_rows();  
+
 		}
+
+		function all_post_toa2($limit,$start,$col,$dir,$assessment_search)
+		{   
+			$yearDate = date("Y");
+			$query =$this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, barangay, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,'-',building_pin ) as pin, building.tax_dec_no, building.id")
+      ->from("building")
+      ->join("building_owner","building_owner.building_id = building.id", "inner")
+      ->join("land","land.id = building.land_id", "inner")
+      ->where("building.last_payment_assessed <",$yearDate)
+      ->or_where("building.last_payment_assessed", null)
+			->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,'-',building_pin,' ',building.tax_dec_no)",$assessment_search)
+			->get();	
+			if($query->num_rows()>0)
+			{
+				return $query->result(); 
+			}
+			else
+			{
+				return null;
+			}
+			
+    }
+    
+   
 		// function post_search_toa($limit,$start,$search,$col,$dir,$assessment_search)
 		// {
 		// 	$yearDate = date("Y");
@@ -703,7 +797,11 @@ function all_post_count($table,$data,$where)
 			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, tax_dec_no, payment_status, mode_of_payment, year_assessed, year_of_effectivity")
 							->from("tax_order")
 							->join("land","tax_order.land_id = land.id","inner")
-							->join("land_owner","land_owner.land_id = land.id","inner")
+              ->join("land_owner","land_owner.land_id = land.id","inner")
+
+              ->join("building","tax_order.building_id = building.id","inner")
+              ->join("building_owner","building_owner.building_id = building_owner.id","inner")
+              
 							->where("mode_of_payment !=", "Compromise")
 							->get();
 
@@ -717,7 +815,11 @@ function all_post_count($table,$data,$where)
 			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, tax_dec_no,payment_status, mode_of_payment, year_assessed, year_of_effectivity")
 							->from("tax_order")
 							->join("land","tax_order.land_id = land.id","inner")
-							->join("land_owner","land_owner.land_id = land.id","inner")
+              ->join("land_owner","land_owner.land_id = land.id","inner")
+              
+              ->join("building","tax_order.building_id = building.id","inner")
+              ->join("building_owner","building_owner.building_id = building_owner.id","inner")
+              
 							->where("mode_of_payment !=", "Compromise")
 							->order_by("tax_order.id", "DESC")
 							->get();	

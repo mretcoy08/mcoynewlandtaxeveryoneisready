@@ -17,9 +17,32 @@ class Building_and_owners extends CI_Controller {
         }
     }
     
-    public function index()
-    {
+  public function index()
+  {
         $this->load->view("template/template.php");
+  }
+  
+  public function insert()
+  {
+     $data = [
+        "building_pin" => clean_data(post("building_no")),
+        "assessed_value" => saveMoney(clean_data(post("building_assessed_value"))),
+        "land_id" => clean_data(post("land_id")),
+        "tax_dec_no" => clean_data(post("tax_dec_no")),
+        "last_paid_assessed" => clean_data(post("last_year_paid")),
+
+     ];
+
+     $query = $this->Main_model->insertWithId("building",$data);
+
+		echo json_encode($query);
+  }
+
+  public function insert_owners()
+	{
+		$data = $this->input->post('ol');
+		$query = $this->Main_model->insert("building_owner",$data);
+		echo json_encode($query);
 	}
 	
 
@@ -52,7 +75,9 @@ class Building_and_owners extends CI_Controller {
 		
 		
 		echo json_encode($query->result());
-	}
+  }
+  
+
     
 }
 ?>

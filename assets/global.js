@@ -3,7 +3,7 @@
 
     
     // url : 'http://localhost/NEWLANDTAX/'
-    url: 'http://192.168.3.121:8000/'
+    url: 'http://192.168.3.24:8000/'
   },
 }
 

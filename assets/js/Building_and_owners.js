@@ -75,6 +75,8 @@ $("#add").click(function(e){
 
   $("#land_pin").change(function(){
     var land_pin = $(this).val();
+
+    
     $.ajax({  
         url: global.settings.url + "Building_and_owners/getland",  
         method:'POST',  
@@ -105,7 +107,7 @@ $("#add").click(function(e){
             $("#city").val(data.city);
             $("#subdivision").val(data.subdivision);
             $("#province").val(data.province);
-
+            $("#land_id").val(data.id);
             $("#class").val(data.class);
             $("#sub_class").val(data.sub_class);
             $("#land_status").val(data.land_status);
@@ -118,6 +120,105 @@ $("#add").click(function(e){
         }  
   });
 });
+
+  $("#additional_owner").click(function(){
+
+    add_line.push({
+      'ol[first_name]' :$("#first_name").val(),
+      'ol[middle_name]' :$("#middle_name").val(),
+      'ol[last_name]' :$("#last_name").val(),
+  });
+
+  var table = document.getElementById("tableOwner");
+  var row= document.createElement("tr");
+  row.setAttribute('id','row'+row_id);
+  row.setAttribute('class','rowrow');
+  var td1 = document.createElement("td");
+  var td2 = document.createElement("td");
+  var td3 = document.createElement("td");
+  var td4 = document.createElement("td");
+  td1.innerHTML = document.getElementById("first_name").value;
+  td2.innerHTML  = document.getElementById("middle_name").value;
+  td3.innerHTML  = document.getElementById("last_name").value;
+  td4.innerHTML  = '<button type="button" class="btn_delete btn btn-danger cor_del" id="'+row_id+'">Delete</button>';
+  row.appendChild(td1);
+  row.appendChild(td2);
+  row.appendChild(td3);
+  row.appendChild(td4);
+  table.children[0].appendChild(row);
+  console.log(add_line);
+  row_id++;
+  row_num++;
+
+  $("#first_name").val("");
+  $("#middle_name").val("");
+  $("#last_name").val("");
+
+});
+
+$(document).on('click', '.btn_delete', function(){
+
+var a = $(this).attr("id");
+row_num--;
+delete add_line[a];
+$('#row'+a+'').remove(); 
+console.log(add_line);
+
+});
+
+$("#add_land_and_owner").submit(function(e){
+  e.preventDefault();
+var data =  $(this).serialize();
+console.table(data);
+
+// Array.prototype.push.apply(save, add_line);
+console.table(save);
+    $.ajax({  
+      url: global.settings.url + "Building_and_owners/insert",  
+      method:'POST',  
+      data:data,  
+      success:function(data)  
+      {  
+         
+          var building_id = data;
+
+          add_line = add_line.filter(function(el){
+            return el != null;
+          });  
+          console.log(add_line);
+
+          for(i=0;i<add_line.length;i++){
+            add_line[i]["ol[building_id]"] = building_id;
+            $.ajax({  
+              url: global.settings.url + "Building_and_owners/insert_owners",  
+              method:'POST',  
+              data:add_line[i],  
+              success:function(data)  
+              {  
+                  
+              }  
+          });  
+
+          }
+          Swal.fire(
+            'Insert Successful!',
+            '',
+            'success'
+          )
+          dataTable.ajax.reload();
+          add_line = [];
+          row_id = 0;
+          row_num = 0;
+          $(".rowrow").remove();
+          $(".new_input").val("");
+          $("#addBuildingAndOwner").modal("hide");
+      
+      }  
+  });  
+
+});
+
+
 
 
 

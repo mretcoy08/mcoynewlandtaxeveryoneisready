@@ -1,3 +1,4 @@
+
 <div class="container">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb rgba-blue-grey-light py-3 ">
@@ -21,15 +22,33 @@
                         </div>
                         <div class="card-body">
                         <div class="row">
-                            <div class="col-md-4">
-                                <label for="">Search by: [PIN,NAME,TAX DECLARATION NO]</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id ="assessment_search" name = "assessment_search">
+                          <div class="col-md-3">
+                            <p>Tax order of Land and Building</p>
+                          </div>
+                          <div class="col-md-4">
+                          </div>
+                          <div class="col-md-5">
+                            <p>Search by: [PIN,NAME,TAX DECLARATION NO]</p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-3">
+                            <select name="taxData" id="taxData" class = "form-control">
+                              <option value="">Please Select...</option>
+                              <option value="Land">Land</option>
+                              <option value="Building">Building</option>
+                            </select>
+                          </div>
+                          <div class="col-md-4">
+                          </div>
+                          <div class="col-md-5">
+                            <div class="input-group">
+                                    <input type="text" class="form-control" id ="assessment_search" name = "assessment_search" disabled>
                                     <span class="input-group-btn">
-                                        <button class="btn btn-primary btn-sm" type="button" id = "assessment_search_btn">Search!</button>
+                                        <button class="btn btn-primary btn-sm" type="button" id = "assessment_search_btn" disabled>Search!</button>
                                     </span>
                                 </div>
-                            </div>
+                          </div>
                         </div>
                         
                         
@@ -74,6 +93,14 @@
                         </div>
                         <div class="card-body">
 
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="">Requestor's Name:</label>
+                              <input type="text" class = "form-control payment" id = "requestor"  name = "requestor" required>
+                            </div>
+                          </div>
+                        </div>
                             <div class="row">
                                 <div class="col-sm-3">
                                     <label class = "bmd-label-floating">Owner/s</label>
@@ -124,12 +151,11 @@
                                             <input type="text" class="form-control payment" name="pin" id="pin" readonly>
                                         </div>  
                                     
-
                                         <div class="form-group">
-                                            <label class = "bmd-label-floating">ARP No.</label>
-                                            <input type="text" class="form-control payment" name="arp" id="arp" readonly>
+                                            <label class = "bmd-label-floating">Location</label>
+                                            <input type="text" class="form-control payment" name="location" id="location" readonly>
                                         </div>  
-                                        
+                                       
                                         <div class="form-group">
                                             <label class = "bmd-label-floating">Last Paid Year</label>
                                             <input type="text" class="form-control payment" name="last_paid_assessed" id="last_paid_assessed" readonly>
@@ -143,9 +169,10 @@
 
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                            <label class = "bmd-label-floating">Location</label>
-                                            <input type="text" class="form-control payment" name="location" id="location" readonly>
-                                        </div>  
+                                          <label class = "bmd-label-floating">ARP No.</label>
+                                          <input type="text" class="form-control payment" name="arp" id="arp" readonly>
+                                      </div>  
+                                        
 
                                     <div class="form-group">
                                         <label class = "bmd-label-floating">Assessed Value:</label>
@@ -164,7 +191,7 @@
                                         <input type="text" class="form-control payment" name="status_of_tax" id="status_of_tax" readonly>
                                     </div>  
 
-                                    <input type="hidden" name = "idd" id = "idd">
+                                    <input type="text" name = "idd" id = "idd">
 
                                    
                                 </div>
@@ -332,7 +359,7 @@
         <hr>
         <h5 class = "text-primary text-center">Payment Information</h5>
         <hr>
-
+        
         <div class="row">
 
             <div class="col-sm-4">

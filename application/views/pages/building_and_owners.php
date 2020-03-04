@@ -90,7 +90,9 @@
                 </div>
             </div>
 
-        <div class="col-md-4"></div>
+        <div class="col-md-4">
+          <input type="text" id = "land_id" name = "land_id" hidden>
+        </div>
 
             <div class="col-md-4">
                 <div class="form-group">
@@ -119,7 +121,16 @@
                 </div>  
             </div>
 
-        <div class="col-md-3"></div>  
+        <div class="col-md-3">
+          <div class="form-group">
+          <label class = "bmd-label-floating">Land Status</label>
+            <select name="building_status" id="building_status" class = "form-control">
+              <option value="">Please Select Land Status...</option>
+              <option value="TAXABLE">TAXABLE</option>
+              <option value="EXEMPTED">EXEMPTED</option>
+            </select>
+          </div>
+        </div>  
 
         <div class="col-md-3">
                 <div class="form-group">
