@@ -30,7 +30,7 @@ class Payment extends CI_Controller {
 		// action('HomeController@getIndex', $params);
 		$orData = [
 			"or_number" => clean_data(post("or_number")),
-			 "or_date" => clean_data(post("or_date")),
+			 "or_date" => date("Y-m-d"),
 		];
 
 		$queryORID = $this->Main_model->insertWithId("or_pool",$orData);
@@ -85,12 +85,12 @@ class Payment extends CI_Controller {
 		];
 		$checkPaid = $this->Main_model->update("tax_order",$updateStatus,$where);
 
-		$getlandId = $this->Main_model->select("tax_order", "land_id",$whereTaxId);
-		$land_id;
-		foreach($getlandId->result() as $k)
-		{
-			$land_id = $k->land_id;
-		}
+		// $getlandId = $this->Main_model->select("tax_order", "land_id",$whereTaxId);
+		// $land_id;
+		// foreach($getlandId->result() as $k)
+		// {
+		// 	$land_id = $k->land_id;
+		// }
 
 		// $table = "land";
 		// $updateData = [
@@ -354,9 +354,9 @@ class Payment extends CI_Controller {
 
 	public function payment_compute()
 	{
-
-		//CHANGE PAYMENT METHOD
-		//COMPROMISE..
+    
+    $taxData = clean_data(post("taxData"));
+		
 		$whereGetPayment = [
 			"tax_order_id" => clean_data(post("id")),	
 		]; 
@@ -428,18 +428,32 @@ class Payment extends CI_Controller {
 			 $nestedData["tax_year"]  = $k->tax_year;
 			 $nestedData["payment_no"]  = $k->payment_no;
 			 $nestedData["land_id"]  = $k->land_id;
-			 $nestedData["payment_id"]  = $k->paymentid;
+       $nestedData["payment_id"]  = $k->paymentid;
+       $nestedData["building_id"]  = $k->building_id;
 			 $nestedData["balance"]  = $k->balance;
 		 }
 
+     
+     if($taxData == "Land")
+     {
+      $ownerAndLandQuery = $this->Main_model->getOwnerAndLandInfo($nestedData["land_id"]);
+
+      $data = [
+        "payment" =>$nestedData,
+        "landAndOwner" => $ownerAndLandQuery,
+      ];
+     }
+     else if($taxData == "Building")
+     {  
+      $ownerAndLandQuery = $this->Main_model->getOwnerAndBuildingInfo($nestedData["building_id"]);
+
+      $data = [
+        "payment" =>$nestedData,
+        "landAndOwner" => $ownerAndLandQuery,
+      ];
+     }
+
 		
-
-		 $ownerAndLandQuery = $this->Main_model->getOwnerAndLandInfo($nestedData["land_id"]);
-
-		 $data = [
-			 "payment" =>$nestedData,
-			 "landAndOwner" => $ownerAndLandQuery,
-		 ];
 
 		// $table = "land";
 		// $updateData = [
@@ -700,6 +714,8 @@ class Payment extends CI_Controller {
 	public function payment_table()
 	{
 		
+    $taxData = clean_data(post("searchType"));
+    $search = clean_data(post("search"));
 
 		$columns = array( 
 			0 =>'first_name', 
@@ -710,65 +726,112 @@ class Payment extends CI_Controller {
 		);
 			$limit = $this->input->post('length');
 			$start = $this->input->post('start');
-			$order = $columns[$this->input->post('order')[0]['column']];
+			// $order = $columns[$this->input->post('order')[0]['column']];
 			$dir = $this->input->post('order')[0]['dir'];
-			$search = $this->input->post('search')['value']; 
+			// $search = $this->input->post('search')['value']; 
 
 			//DATATABLE VARIABLES
-
+      
 			//END OF DATATABLE VARIABLES
+      if($taxData == "Land")
+      {
+        $totalData = $this->Main_model->all_post_paymentland_count($search);
 
-			$totalData = $this->Main_model->all_post_payment_count();
+        $totalFiltered = $totalData; 
+  
+                 
+        $posts = $this->Main_model->all_post_paymentland($limit,$start,$dir,$search);
 
-			$totalFiltered = $totalData; 
+        $data = array();
+        if(!empty($posts))
+        {
+        foreach ($posts as $post)
+        {
+        $nestedData['owner'] = $post->full_name;
+        $nestedData['location'] = $post->barangay;
+        $nestedData['pin'] = $post->pin;
+        $nestedData['tax_dec_no'] = $post->tax_dec_no;
+        $nestedData["year_assessed"] = $post->year_assessed;
+        if($post->payment_status == "PENDING")
+        {
+          $nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'payment(".$post->id.")' data-toggle='tooltip' title='TAX PAYMENT'><i class='fa fa-money-bill-alt'></i></button>
+          <button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")'data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button> 
+          <button class = ' btn btn-danger btn-sm payment' onclick='payment_method(\"".$post->id."\")'data-toggle='tooltip' title='CHANGE MODE OF PAYMENT'>  <i class='fa fa-handshake'></i></button> ";
+        }
+        else{
+          if($post->year_of_effectivity >= date("Y")){
+            $nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>
+          <button class = ' btn btn-primary btn-sm' onclick= 'clearance(".$post->id.")' data-toggle='tooltip' title='CLEARANCE PAYMENT'><i class='fa fa-money-bill-alt'></i></button>";
+          }
+          else{
+            $nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
+          }
+          
+        }
+        $data[] = $nestedData;
+        }
+        }
+  
+        $json_data = array(
+          "draw"            => intval($this->input->post('draw')),  
+          "recordsTotal"    => intval($totalData),  
+          "recordsFiltered" => intval($totalFiltered), 
+          "data"            => $data   
+          );
+          
+        echo json_encode($json_data); 
+      }
+      else if($taxData == "Building")
+      {
+        $totalData = $this->Main_model->all_post_paymentbuilding_count($search);
 
-			if(empty($this->input->post('search')['value']))
-			{            
-			$posts = $this->Main_model->all_post_payment($limit,$start,$order,$dir);
-			}
-			else {
-			$posts =  $this->Main_model->all_post_payment_search($limit,$start,$search,$order,$dir);
-			$totalFiltered = $this->Main_model->all_post_payment_search_count($search);
-			}
-			$data = array();
-			if(!empty($posts))
-			{
-			foreach ($posts as $post)
-			{
-			$nestedData['owner'] = $post->full_name;
-			$nestedData['location'] = $post->barangay;
-			$nestedData['pin'] = $post->pin;
-			$nestedData['tax_dec_no'] = $post->tax_dec_no;
-			$nestedData["year_assessed"] = $post->year_assessed;
-			if($post->payment_status == "PENDING")
-			{
-				$nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'payment(".$post->id.")' data-toggle='tooltip' title='TAX PAYMENT'><i class='fa fa-money-bill-alt'></i></button>
-				<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")'data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button> 
-				<button class = ' btn btn-danger btn-sm payment' onclick='payment_method(\"".$post->id."\")'data-toggle='tooltip' title='CHANGE MODE OF PAYMENT'>  <i class='fa fa-handshake'></i></button> ";
-			}
-			else{
-				if($post->year_of_effectivity >= date("Y")){
-					$nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>
-				<button class = ' btn btn-primary btn-sm' onclick= 'clearance(".$post->id.")' data-toggle='tooltip' title='CLEARANCE PAYMENT'><i class='fa fa-money-bill-alt'></i></button>";
-				}
-				else{
-					$nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
-				}
-				
-			}
-			$data[] = $nestedData;
-			}
-			}
+        $totalFiltered = $totalData; 
+  
+                 
+        $posts = $this->Main_model->all_post_paymentbuilding($limit,$start,$dir,$search);
 
-			$json_data = array(
-				"draw"            => intval($this->input->post('draw')),  
-				"recordsTotal"    => intval($totalData),  
-				"recordsFiltered" => intval($totalFiltered), 
-				"data"            => $data   
-				);
-				
-			echo json_encode($json_data); 
+        $data = array();
+        if(!empty($posts))
+        {
+        foreach ($posts as $post)
+        {
+        $nestedData['owner'] = $post->full_name;
+        $nestedData['location'] = $post->barangay;
+        $nestedData['pin'] = $post->pin;
+        $nestedData['tax_dec_no'] = $post->tax_dec_no;
+        $nestedData["year_assessed"] = $post->year_assessed;
+        if($post->payment_status == "PENDING")
+        {
+          $nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'payment(".$post->id.")' data-toggle='tooltip' title='TAX PAYMENT'><i class='fa fa-money-bill-alt'></i></button>
+          <button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")'data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button> 
+          <button class = ' btn btn-danger btn-sm payment' onclick='payment_method(\"".$post->id."\")'data-toggle='tooltip' title='CHANGE MODE OF PAYMENT'>  <i class='fa fa-handshake'></i></button> ";
+        }
+        else{
+          if($post->year_of_effectivity >= date("Y")){
+            $nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>
+          <button class = ' btn btn-primary btn-sm' onclick= 'clearance(".$post->id.")' data-toggle='tooltip' title='CLEARANCE PAYMENT'><i class='fa fa-money-bill-alt'></i></button>";
+          }
+          else{
+            $nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
+          }
+          
+        }
+        $data[] = $nestedData;
+        }
+        }
+  
+        $json_data = array(
+          "draw"            => intval($this->input->post('draw')),  
+          "recordsTotal"    => intval($totalData),  
+          "recordsFiltered" => intval($totalFiltered), 
+          "data"            => $data   
+          );
+          
+        echo json_encode($json_data); 
+      }
+
 	}
 
 
 }
+?>

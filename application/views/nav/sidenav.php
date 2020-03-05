@@ -78,7 +78,6 @@
 				<div class="container-fluid">
 					<a id="sidebarCollapse" class="btn-sm">
 						<i class="text-dark fas fa-bars fa-lg"></i>
-						<span></span>
 					</a>
 					<img src="<?php echo base_url() .'assets/img/land_tax.png'?>" height="40px" >
 					<h3 class="pt-2 ml-3 font-weight-bold"><strong></strong></h3>

@@ -22,34 +22,34 @@
                         </div>
                         <div class="card-body">
                         <div class="row">
-                          <div class="col-md-3">
-                            <p>Tax order of Land and Building</p>
-                          </div>
-                          <div class="col-md-4">
-                          </div>
-                          <div class="col-md-5">
-                            <p>Search by: [PIN,NAME,TAX DECLARATION NO]</p>
-                          </div>
+                            <div class="col-md-3">
+                              <p>Tax order of Land and Building</p>
+                            </div>
+                            <div class="col-md-4">
+                            </div>
+                            <div class="col-md-5">
+                              <p>Search by: [PIN,NAME,TAX DECLARATION NO]</p>
+                            </div>
                         </div>
                         <div class="row">
-                          <div class="col-md-3">
-                            <select name="taxData" id="taxData" class = "form-control">
-                              <option value="">Please Select...</option>
-                              <option value="Land">Land</option>
-                              <option value="Building">Building</option>
-                            </select>
+                            <div class="col-md-3">
+                              <select name="taxData" id="taxData" class = "form-control">
+                                <option value="">Please Select...</option>
+                                <option value="Land">Land</option>
+                                <option value="Building">Building</option>
+                              </select>
+                            </div>
+                            <div class="col-md-4">
+                            </div>
+                            <div class="col-md-5">
+                              <div class="input-group">
+                                      <input type="text" class="form-control" id ="assessment_search" name = "assessment_search" disabled>
+                                      <span class="input-group-btn">
+                                          <button class="btn btn-primary btn-sm" type="button" id = "assessment_search_btn" disabled>Search!</button>
+                                      </span>
+                                  </div>
+                            </div>
                           </div>
-                          <div class="col-md-4">
-                          </div>
-                          <div class="col-md-5">
-                            <div class="input-group">
-                                    <input type="text" class="form-control" id ="assessment_search" name = "assessment_search" disabled>
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-primary btn-sm" type="button" id = "assessment_search_btn" disabled>Search!</button>
-                                    </span>
-                                </div>
-                          </div>
-                        </div>
                         
                         
                         <div class="row">

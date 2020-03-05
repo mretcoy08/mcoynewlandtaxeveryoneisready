@@ -32,34 +32,79 @@ $(document).ready(function(){
    
 });
 
-
-
-
-$(document).ready(function () {
+function payment_table(search,searchType)
+{   
+   
     
-    dataTable = $('#posts').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "ajax":{
-         "url": global.settings.url + "Payment/payment_table",
-         "dataType": "json",
-         "type": "POST",
-         "data":{  '<?php echo $this->security->get_csrf_token_name(); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>' }
-                       },
-    "columns": [
-              
-              { "data": "owner"},
-              { "data": "location" },
-              { "data": "pin" },
-              { "data": "tax_dec_no" },
-              { "data": "year_assessed" },
-              { "data": "action" },
-             
-           ]    
-  
-  
+        dataTable = $('#posts').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "bFilter": false,
+            "ajax":{
+             "url": global.settings.url + "Payment/payment_table",
+             "data":{search:search,searchType:searchType},
+             "dataType": "json",
+             "type": "POST",
+            
+             },
+                        
+        "columns": [
+                  
+                { "data": "owner"},
+                { "data": "location" },
+                { "data": "pin" },
+                { "data": "tax_dec_no" },
+                { "data": "year_assessed" },
+                { "data": "action" },
+         
+               ]    
     });
-  });
+}
+
+$("#taxData").change(function(){
+  var data = $(this).val();
+  
+  if(data == "")
+  {
+      $("#payment_search_btn").attr("disabled", true);
+      $("#payment_search").attr("disabled", true);
+      var search = "asdqwezxc123";
+      $('#posts').DataTable().clear().destroy();
+      payment_table(search,searchType);
+  }
+  else
+  {
+  
+    $("#payment_search_btn").attr("disabled", false);
+      $("#payment_search").attr("disabled", false);
+  }
+
+});
+
+$("#payment_search_btn").click(function(e){
+  e.preventDefault();
+  var searchType = $("#taxData").val();
+  // var check = $("#assessment_search").val();
+  // $("#posts").dataTable().fnDestroy();
+  var search = $("#payment_search").val();
+  //     console.log(search);
+  // if($.trim(search) == ''){
+  //     Swal.fire('You can\'t search with empty input field');
+     
+  // }
+  // else{
+      // $("#posts").dataTable().fnDestroy();
+      // $('#posts').DataTable().fnClearTable();
+    
+      $('#posts').DataTable().clear().destroy();
+      payment_table(search,searchType);
+  // }
+  
+
+});
+
+
+
 
 
 
@@ -414,11 +459,11 @@ function cancelOR(value){
       console.log(id);
       $(".owners").remove();
       $("#addPayment").modal("show");
-    
+      var taxData = $("#taxData").val();
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Payment/payment_compute',
-        data:{id: id},
+        data:{id: id, taxData:taxData},
         dataType:"json",
         success : function(data){
             var landAndOwner = data.landAndOwner;

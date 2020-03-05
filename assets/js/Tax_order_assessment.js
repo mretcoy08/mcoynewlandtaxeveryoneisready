@@ -65,7 +65,7 @@ $("#taxData").change(function(){
       $("#assessment_search").attr("disabled", true);
       var search = "asdqwezxc123";
       $('#posts').DataTable().clear().destroy();
-      assessment_table(search);
+      assessment_table(search),searchType;
   }
   else
   {
