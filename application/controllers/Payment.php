@@ -37,7 +37,7 @@ class Payment extends CI_Controller {
 
 
 		$getData = [
-			 "payor_name" => ucwords(clean_data(post("first_name")))." ".ucwords(clean_data(post("middle_name"))).' '.ucwords(clean_data(post("last_name"))),
+			 "payor_name" => clean_data(post("payor_name")),
 			 "cash_rec" => saveMoney(clean_data(post("cash_rec"))),
 			 "check_rec" => saveMoney(clean_data(post("check_rec"))),
 			 "total_rec" => saveMoney(clean_data(post("total_rec"))),
@@ -107,30 +107,53 @@ class Payment extends CI_Controller {
 
 	public function view_OR()
 	{
+    $taxData = clean_data(post("taxData"));
 		$where = [
 			"payment.id" => clean_data(post("id")),
 		];
 
-		  
-		$orData = $this->Main_model->getOrPayment($where);
-		$data['orData'] = $orData->result();
-
-		echo json_encode($data);
-		$this->load->view('pages/viewReceipt',$data);
+    if($taxData == "Land")
+    {
+      $orData = $this->Main_model->getOrPayment($where);
+      $data['orData'] = $orData->result();
+  
+      echo json_encode($data);
+      $this->load->view('pages/viewReceipt',$data);
+    }
+    else if($taxData == "Building")
+    {
+      $orData = $this->Main_model->getOrPaymentBuilding($where);
+      $data['orData'] = $orData->result();
+  
+      echo json_encode($data);
+      $this->load->view('pages/viewReceipt',$data);
+    }
+	
 	}
 
 	public function print_OR()
 	{
+    $taxData = clean_data(post("taxData"));
 		$where = [
 			"payment.id" => clean_data(post("id")),
 		];
 
-		  
-		$orData = $this->Main_model->getOrPayment($where);
-		$data['orData'] = $orData->result();
-
-		echo json_encode($data);
-		$this->load->view('pages/printReceipt',$data);
+    if($taxData == "Land")
+    {
+      $orData = $this->Main_model->getOrPayment($where);
+      $data['orData'] = $orData->result();
+  
+      echo json_encode($data);
+      $this->load->view('pages/printReceipt',$data);
+    }
+    else if($taxData == "Building")
+    {
+      $orData = $this->Main_model->getOrPaymentBuilding($where);
+      $data['orData'] = $orData->result();
+  
+      echo json_encode($data);
+      $this->load->view('pages/printReceipt',$data);
+    }
 	}
 
 
@@ -145,35 +168,54 @@ class Payment extends CI_Controller {
 
 	public function payment_history()
 	{
+    $taxData = clean_data(post("taxData"));
+    
 		$where = [
 			"tax_order.id" => clean_data(post("id")),
 		];
-		$pinQuery = $this->Main_model->getPin($where);
-		$pin;
+		$pinQuery = $this->Main_model->select("tax_order","building_id,land_id",$where);
+    $building_id;
+    $land_id;
 		foreach($pinQuery->result() as $k)
 		{
-			$pin = $k->pin;
+      $building_id = $k->building_id;
+      $land_id = $k->land_id;
 		}
 		
 		$where = [
 			"payment.payment_status" => "PAID",
-	
 		];
 
-
-		$taxOrder = $this->Main_model->getTaxOrder($pin);
+    $data = [];
+    if($taxData == "Land")
+    {
+      $taxOrder = $this->Main_model->getTaxOrderLand($land_id);
+      $payment = $this->Main_model->getPaymentHistoryLand($land_id,$where);
+      $owner = $this->Main_model->getLandAndOwner($land_id);
+      $data = [
+        "payment" => $payment->result(),
+        "owner" => $owner->result(),
+        "tax_order" => $taxOrder->result(),
+        "admin" => $this->session->userdata("role"),
+      ];
+      
+      echo json_encode($data);
+    }
+    else if($taxData == "Building")
+    {
+      $taxOrder = $this->Main_model->getTaxOrderBuilding($building_id);
+      $payment = $this->Main_model->getPaymentHistoryBuilding($building_id,$where);
+      $owner = $this->Main_model->getBuildingAndOwner($building_id);
+      $data = [
+        "payment" => $payment->result(),
+        "owner" => $owner->result(),
+        "tax_order" => $taxOrder->result(),
+        "admin" => $this->session->userdata("role"),
+      ];
+      
+      echo json_encode($data);
+    }
 	
-		$payment = $this->Main_model->getPaymentHistory($pin,$where);
-		$owner = $this->Main_model->getLandAndOwner($pin);
-
-		$data = [
-			"payment" => $payment->result(),
-			"owner" => $owner->result(),
-			"tax_order" => $taxOrder->result(),
-			"admin" => $this->session->userdata("role"),
-		];
-		
-		echo json_encode($data);
 
 		
 	}

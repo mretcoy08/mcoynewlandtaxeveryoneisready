@@ -1,4 +1,7 @@
 
+
+let garbageFee = 360.00;
+
 var dataTable;
 $(document).ready(function(){
 
@@ -246,6 +249,7 @@ $("#print").click(function(e){
     var year_of_effectivity = $('#year_of_effectivity').val();
     var number_of_payment = $("#number_of_payment").val();
     var down_payment = $("#down_payment").val();
+    var garbageFee = $("#garbage_fee").val();
     console.log(taxData);
     console.log(penalty_total);    
 
@@ -273,7 +277,7 @@ $("#print").click(function(e){
                     $.ajax({
                         type : 'POST',
                         url : global.settings.url + 'Tax_order_assessment/print_taxOrder',
-                        data:{taxData:taxData,down_payment:down_payment,number_of_payment:number_of_payment,discount_total:discount_total,year_of_effectivity:year_of_effectivity,basic_total:basic_total,penalty_total:penalty_total,mop1:mop1,mop2:mop2,mop3:mop3,mop4:mop4,id:id, mode_of_payment:mode_of_payment,last_paid_year:last_paid_year,assessed_value:assessed_value,basic_fee:basic_fee,total_fee:total_fee},
+                        data:{garbageFee:garbageFee,taxData:taxData,down_payment:down_payment,number_of_payment:number_of_payment,discount_total:discount_total,year_of_effectivity:year_of_effectivity,basic_total:basic_total,penalty_total:penalty_total,mop1:mop1,mop2:mop2,mop3:mop3,mop4:mop4,id:id, mode_of_payment:mode_of_payment,last_paid_year:last_paid_year,assessed_value:assessed_value,basic_fee:basic_fee,total_fee:total_fee},
                         dataType:"json",
                         success: function(data) {
                             console.log(data);
@@ -477,23 +481,25 @@ $("#compute").click(function(e){
             $("#total_discount").val(money(total_discount));
             $("#basic_fee").val(money(total_fee));
             $("#special_education_fee").val(money(total_fee));
-            $("#total_fee").val(money(total_fee*2));
+            $("#garbage_fee").val(money(garbageFee));
+            $("#total_fee").val(money(total_fee*2 + garbageFee));
+            
             $(".mop").remove();
             var html_mop = "<div class = 'mop'>"+mode_of_payment+"<br>";
             switch(mode_of_payment){
                 case "Annually" :
-                    var annual = total_fee * 2;
+                    var annual = total_fee * 2 + garbageFee;
                     html_mop += "1st <input type = 'text' class= 'form-control mop' id ='mop1' value ='"+money(annual)+"' readonly/> ";
                 break;
                 case "Semi Annually" :
-                    var semi1st = (parseFloat(total_fee) * 2) - (parseFloat(data['basic'][0][0])* 2)/2 ;
+                    var semi1st = (parseFloat(total_fee) * 2) - (parseFloat(data['basic'][0][0])* 2)/2   + parseFloat(garbageFee);
                     var semi = (parseFloat(data['basic'][0][0])*2)/2;
                     html_mop += "1st <input type = 'text' class= 'form-control mop' id ='mop1' value = '"+money(semi1st)+"'  readonly/> ";
                     html_mop += "2nd <input type = 'text' class= 'form-control mop' id ='mop2' value ='"+money(semi)+"' readonly/>";
 
                 break;
                 case "Quarterly" :
-                    var quarterly1st = ((parseFloat(total_fee) * 2)+(parseFloat(data['basic'][0][0])/2)) - (parseFloat(data['basic'][0][0])* 2) ;
+                    var quarterly1st = ((parseFloat(total_fee) * 2)+(parseFloat(data['basic'][0][0])/2)) - (parseFloat(data['basic'][0][0])* 2) + parseFloat(garbageFee) ;
                     var quarter = (parseFloat(data['basic'][0][0])*2)/4;
                     html_mop += "1st <input type = 'text' class= 'form-control mop' id ='mop1' value = '"+money(quarterly1st)+"' readonly/> ";
                     html_mop += "2nd <input type = 'text' class= 'form-control mop' id ='mop2' value ='"+money(quarter)+"' readonly/> ";

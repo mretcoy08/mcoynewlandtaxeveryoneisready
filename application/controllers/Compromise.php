@@ -29,13 +29,13 @@ class Compromise extends CI_Controller {
 
 		$orData = [
 			"or_number" => clean_data(post("or_number")),
-			 "or_date" => clean_data(post("or_date")),
+			 "or_date" => date("Y-m-d"),
 		];
 
 		$queryORID = $this->Main_model->insertWithId("or_pool",$orData);
 
 		$getData = [
-			 "payor_name" => ucwords(clean_data(post("first_name")))." ".ucwords(clean_data(post("middle_name"))).' '.ucwords(clean_data(post("last_name"))),
+			 "payor_name" => clean_data(post("payor_name")),
 			 "or_pool_id" => $queryORID,
 			 "cash_rec" => saveMoney(clean_data(post("cash_rec"))),
 			 "check_rec" => saveMoney(clean_data(post("check_rec"))),
@@ -60,10 +60,10 @@ class Compromise extends CI_Controller {
 			 
 		}
 		
-		$updateData = [	
+		$updateData1 = [	
 			"balance" => Floatval(saveMoney(clean_data(post("balance")))) - Floatval(saveMoney(clean_data(post("due_total")))),
 		];
-		$query = $this->Main_model->update("tax_order",$updateData,$whereTaxId);
+		$query = $this->Main_model->update("tax_order",$updateData1,$whereTaxId);
 
 		$updateStatus = [
 			"payment_status" => "PAID"
@@ -90,7 +90,7 @@ class Compromise extends CI_Controller {
 		$query = $this->Main_model->update($table,$updateData,$where);
 
 
-		echo json_encode($query);
+		echo json_encode($updateData1);
     }
 
     public function compromise_check()
@@ -105,6 +105,9 @@ class Compromise extends CI_Controller {
 
 	public function compromise_payment()
 	{
+
+    $taxData = clean_data(post("taxData"));
+
 		$whereGetPayment = [
 			"tax_order_id" => clean_data(post("id")),	
 		]; 
@@ -131,82 +134,170 @@ class Compromise extends CI_Controller {
 			$nestedData["due_total"]  = $k->due_total;
 			$nestedData["tax_year"]  = $k->tax_year;
 			$nestedData["payment_no"]  = $k->payment_no;
-			$nestedData["land_id"]  = $k->land_id;
+      $nestedData["land_id"]  = $k->land_id;
+      $nestedData["building_id"]  = $k->building_id;
 			$nestedData["payment_id"]  = $k->id;
-            $nestedData["balance"]  = $k->balance;
+      $nestedData["balance"]  = $k->balance;
 		}
 
 	   
+    if($taxData == "Land")
+    {
+      $ownerAndLandQuery = $this->Main_model->getOwnerAndLandInfo($nestedData["land_id"]);
 
-		$ownerAndLandQuery = $this->Main_model->getOwnerAndLandInfo($nestedData["land_id"]);
+      $data = [
+        "payment" =>$nestedData,
+        "landAndOwner" => $ownerAndLandQuery,
+      ];
+  
+      echo json_encode($data);
+    }
+    else if($taxData == "Building")
+    {
+      $ownerAndLandQuery = $this->Main_model->getOwnerAndBuildingInfo($nestedData["building_id"]);
 
-		$data = [
-			"payment" =>$nestedData,
-			"landAndOwner" => $ownerAndLandQuery,
-		];
+      $data = [
+        "payment" =>$nestedData,
+        "landAndOwner" => $ownerAndLandQuery,
+      ];
+  
+      echo json_encode($data);
+    }
+		// $ownerAndLandQuery = $this->Main_model->getOwnerAndLandInfo($nestedData["land_id"]);
 
-		echo json_encode($data);
+		// $data = [
+		// 	"payment" =>$nestedData,
+		// 	"landAndOwner" => $ownerAndLandQuery,
+		// ];
+
+		// echo json_encode($data);
 	}
 	
 
 	public function compromise_history()
 	{
-		$getWhereHistory = [
+    $taxData = clean_data(post("taxData"));
+		$where = [
 			"tax_order.id" => clean_data(post("id")),
-		];
-		$pinQuery = $this->Main_model->getPin($getWhereHistory);
-		$pin;
+    ];
+    
+    $pinQuery = $this->Main_model->select("tax_order","building_id,land_id",$where);
+    $building_id;
+    $land_id;
 		foreach($pinQuery->result() as $k)
 		{
-			$pin = $k->pin;
+      $building_id = $k->building_id;
+      $land_id = $k->land_id;
 		}
 
-		$where = [
-			"compromise.payment_status" => "PAID",
+
+		// $where = [
+		// 	"compromise.payment_status" => "PAID",
 	
-		];
-		$taxOrder = $this->Main_model->getTaxOrder($pin);
-		$payment = $this->Main_model->getCompromiseHistory($pin,$where);
+		// ];
+		// $taxOrder = $this->Main_model->getTaxOrder($pin);
+		// $payment = $this->Main_model->getCompromiseHistory($pin,$where);
 
-		$owner = $this->Main_model->getLandAndOwner($pin);
+		// $owner = $this->Main_model->getLandAndOwner($pin);
 
-		$data = [
-			"payment" => $payment->result(),
-			"owner" => $owner->result(),
-			"tax_order" => $taxOrder->result(),
-			"admin" => $this->session->userdata("role"),
+		// $data = [
+		// 	"payment" => $payment->result(),
+		// 	"owner" => $owner->result(),
+		// 	"tax_order" => $taxOrder->result(),
+		// 	"admin" => $this->session->userdata("role"),
+		// ];
+    // echo json_encode($data);
+    
+
+    $where = [
+			"compromise.payment_status" => "PAID",
 		];
-		echo json_encode($data);
+
+    $data = [];
+    if($taxData == "Land")
+    {
+      $taxOrder = $this->Main_model->getTaxOrderLand($land_id);
+      $payment = $this->Main_model->getCompromiseHistoryLand($land_id,$where);
+      $owner = $this->Main_model->getLandAndOwner($land_id);
+      $data = [
+        "payment" => $payment->result(),
+        "owner" => $owner->result(),
+        "tax_order" => $taxOrder->result(),
+        "admin" => $this->session->userdata("role"),
+      ];
+      
+      echo json_encode($data);
+    }
+    else if($taxData == "Building")
+    {
+      $taxOrder = $this->Main_model->getTaxOrderBuilding($building_id);
+      $payment = $this->Main_model->getCompromiseHistoryBuilding($building_id,$where);
+      $owner = $this->Main_model->getBuildingAndOwner($building_id);
+      $data = [
+        "payment" => $payment->result(),
+        "owner" => $owner->result(),
+        "tax_order" => $taxOrder->result(),
+        "admin" => $this->session->userdata("role"),
+      ];
+      
+      echo json_encode($data);
+    }
+	
 
 
 	}
 
 	public function view_OR()
 	{
+
+    $taxData = clean_data(post("taxData"));
 		$where = [
 			"compromise.id" => clean_data(post("id")),
 		];
 
-		  
-		$orData = $this->Main_model->getOrCompromise($where);
-		$data['orData'] = $orData->result();
+    if($taxData == "Land")
+    {
+      $orData = $this->Main_model->getOrCompromise($where);
+      $data['orData'] = $orData->result();
 
-		echo json_encode($data);
-		$this->load->view('pages/viewReceipt',$data);
+      echo json_encode($data);
+      $this->load->view('pages/viewReceipt',$data);
+    }
+    else if($taxData == "Building")
+    {
+      $orData = $this->Main_model->getOrCompromiseBuilding($where);
+      $data['orData'] = $orData->result();
+  
+      echo json_encode($data);
+      $this->load->view('pages/viewReceipt',$data);
+    }
+		  
+		
 	}
 
 	public function print_OR()
 	{
+    $taxData = clean_data(post("taxData"));
 		$where = [
 			"compromise.id" => clean_data(post("id")),
 		];
 
-		  
-		$orData = $this->Main_model->getOrCompromise($where);
-		$data['orData'] = $orData->result();
+    if($taxData == "Land")
+    {
+      $orData = $this->Main_model->getOrCompromise($where);
+      $data['orData'] = $orData->result();
 
-		echo json_encode($data);
-		$this->load->view('pages/printReceipt',$data);
+      echo json_encode($data);
+      $this->load->view('pages/printReceipt',$data);
+    }
+    else if($taxData == "Building")
+    {
+      $orData = $this->Main_model->getOrCompromiseBuilding($where);
+      $data['orData'] = $orData->result();
+  
+      echo json_encode($data);
+      $this->load->view('pages/printReceipt',$data);
+    }
 	}
 
 	public function cancelOR_verification()
@@ -275,15 +366,14 @@ class Compromise extends CI_Controller {
 		}
 		$newData = [
 			"due_basic" => $cancelData["due_basic"],
-			"due_sef" => $cancelData["due_sef"],
+      "due_sef" => $cancelData["due_sef"],
+      "due_total" => $cancelData["due_basic"] * 2,
 			"payment_no" => $cancelData["payment_no"],
-			"due_date" => $cancelData["due_date"],
-			"start_date" => $cancelData["start_date"],
 			"tax_order_id" => $cancelData["tax_order_id"],
 			"tax_year" => $cancelData["tax_year"],
 		];
-		$this->Main_model->insert("payment",$newData);
-		$sumBalance = (Floatval($cancelData["due_basic"]) + Floatval($cancelData["due_sef"]));
+		$this->Main_model->insert("compromise",$newData);
+		$sumBalance = (Floatval($cancelData["due_basic"]) + Floatval($cancelData["due_sef"])) +Floatval($balance);
 		$updateData = [
 			"balance" => $sumBalance,
 			"payment_status" => "PENDING",
@@ -301,7 +391,10 @@ class Compromise extends CI_Controller {
 
 	public function compromise_table()
 	{
-		
+    
+    
+    $search = clean_data(post(""));
+    $searchType = clean_data(post("searchType"));
 
 		$columns = array( 
 			0 =>'first_name', 
@@ -314,62 +407,117 @@ class Compromise extends CI_Controller {
 			$start = $this->input->post('start');
 			$order = $columns[$this->input->post('order')[0]['column']];
 			$dir = $this->input->post('order')[0]['dir'];
-			$search = $this->input->post('search')['value']; 
+		
 
 			//DATATABLE VARIABLES
 
 			//END OF DATATABLE VARIABLES
+      if($searchType == "Land")
+      {
+        $totalData = $this->Main_model->all_post_compromise_land_count($search);
 
-			$totalData = $this->Main_model->all_post_compromise_count();
+        $totalFiltered = $totalData; 
+  
+        if(empty($this->input->post('search')['value']))
+        {            
+        $posts = $this->Main_model->all_post_compromise_land($limit,$start,$order,$dir,$search);
+        }
 
-			$totalFiltered = $totalData; 
+            $data = array();
+          if(!empty($posts))
+          {
+          foreach ($posts as $post)
+          {
+          $nestedData['owner'] = $post->full_name;
+          $nestedData['location'] = $post->barangay;
+          $nestedData['pin'] = $post->pin;
+          $nestedData['tax_dec_no'] = $post->tax_dec_no;
+          $nestedData["year_assessed"] = $post->year_assessed;
+          if($post->payment_status == "PENDING")
+          {
+            $nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'compromise(".$post->id.")' data-toggle='tooltip' title='TAX PAYMENT'><i class='fa fa-money-bill-alt'></i></button>
+            <button class = ' btn btn-warning btn-sm payment' onclick='compromise_history(\"".$post->id."\")'data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
+            
+          }
+          else{
+            if($post->year_of_effectivity >= date("Y")){
+              $nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>
+            <button class = ' btn btn-primary btn-sm' onclick= 'clearance(".$post->id.")' data-toggle='tooltip' title='CLEARANCE PAYMENT'><i class='fa fa-money-bill-alt'></i></button>";
+            }
+            else{
+              $nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
+            }
+            
+          }
+          $data[] = $nestedData;
+          }
+          }
 
-			if(empty($this->input->post('search')['value']))
-			{            
-			$posts = $this->Main_model->all_post_compromise($limit,$start,$order,$dir);
-			}
-			else {
-			$posts =  $this->Main_model->all_post_compromise_search($limit,$start,$search,$order,$dir);
-			$totalFiltered = $this->Main_model->all_post_compromise_search_count($search);
-			}
-			$data = array();
-			if(!empty($posts))
-			{
-			foreach ($posts as $post)
-			{
-			$nestedData['owner'] = $post->full_name;
-			$nestedData['location'] = $post->barangay;
-			$nestedData['pin'] = $post->pin;
-			$nestedData['tax_dec_no'] = $post->tax_dec_no;
-			$nestedData["year_assessed"] = $post->year_assessed;
-			if($post->payment_status == "PENDING")
-			{
-				$nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'compromise(".$post->id.")' data-toggle='tooltip' title='TAX PAYMENT'><i class='fa fa-money-bill-alt'></i></button>
-				<button class = ' btn btn-warning btn-sm payment' onclick='compromise_history(\"".$post->id."\")'data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
-				
-			}
-			else{
-				if($post->year_of_effectivity >= date("Y")){
-					$nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>
-				<button class = ' btn btn-primary btn-sm' onclick= 'clearance(".$post->id.")' data-toggle='tooltip' title='CLEARANCE PAYMENT'><i class='fa fa-money-bill-alt'></i></button>";
-				}
-				else{
-					$nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='payment_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
-				}
-				
-			}
-			$data[] = $nestedData;
-			}
-			}
+          $json_data = array(
+            "draw"            => intval($this->input->post('draw')),  
+            "recordsTotal"    => intval($totalData),  
+            "recordsFiltered" => intval($totalFiltered), 
+            "data"            => $data   
+            );
+            
+          echo json_encode($json_data); 
+          }
+      else if($searchType == "Building")
+      {
+        $totalData = $this->Main_model->all_post_compromise_building_count($search);
 
-			$json_data = array(
-				"draw"            => intval($this->input->post('draw')),  
-				"recordsTotal"    => intval($totalData),  
-				"recordsFiltered" => intval($totalFiltered), 
-				"data"            => $data   
-				);
-				
-			echo json_encode($json_data); 
+        $totalFiltered = $totalData; 
+  
+        if(empty($this->input->post('search')['value']))
+        {            
+        $posts = $this->Main_model->all_post_compromise_building($limit,$start,$order,$dir,$search);
+        }
+
+        $data = array();
+        if(!empty($posts))
+        {
+        foreach ($posts as $post)
+        {
+        $nestedData['owner'] = $post->full_name;
+        $nestedData['location'] = $post->barangay;
+        $nestedData['pin'] = $post->pin;
+        $nestedData['tax_dec_no'] = $post->tax_dec_no;
+        $nestedData["year_assessed"] = $post->year_assessed;
+        if($post->payment_status == "PENDING")
+        {
+          $nestedData['action'] = "<button class = ' btn btn-success btn-sm' onclick= 'compromise(".$post->id.")' data-toggle='tooltip' title='TAX PAYMENT'><i class='fa fa-money-bill-alt'></i></button>
+          <button class = ' btn btn-warning btn-sm payment' onclick='compromise_history(\"".$post->id."\")'data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
+          
+        }
+        else{
+          if($post->year_of_effectivity >= date("Y")){
+            $nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='compromise_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>
+          <button class = ' btn btn-primary btn-sm' onclick= 'clearance(".$post->id.")' data-toggle='tooltip' title='CLEARANCE PAYMENT'><i class='fa fa-money-bill-alt'></i></button>";
+          }
+          else{
+            $nestedData['action'] = "<button class = ' btn btn-warning btn-sm payment' onclick='compromise_history(\"".$post->id."\")' data-toggle='tooltip' title='PAYMENT HISTORY'>  <i class='fa fa-history'></i></button>";
+          }
+          
+        }
+        $data[] = $nestedData;
+        }
+        }
+  
+        $json_data = array(
+          "draw"            => intval($this->input->post('draw')),  
+          "recordsTotal"    => intval($totalData),  
+          "recordsFiltered" => intval($totalFiltered), 
+          "data"            => $data   
+          );
+          
+        echo json_encode($json_data); 
+      }
+			
+			// else {
+			// $posts =  $this->Main_model->all_post_compromise_search($limit,$start,$search,$order,$dir);
+			// $totalFiltered = $this->Main_model->all_post_compromise_search_count($search);
+			// }
+		
 	}
 
 

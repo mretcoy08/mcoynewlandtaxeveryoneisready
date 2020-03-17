@@ -198,7 +198,8 @@ class Tax_order_assessment extends CI_Controller {
 					"last_paid_year" => clean_data(post("last_paid_year")),
 					"assessed_value" => saveMoney(clean_data(post("assessed_value"))),
 					"basic_fee" => saveMoney(clean_data(post("basic_fee"))),
-					"total_fee" => saveMoney(clean_data(post("total_fee"))),
+          "total_fee" => saveMoney(clean_data(post("total_fee"))),
+          "garbageFee" => clean_data(post("garbageFee")),
 					"mop1" => saveMoney(clean_data(post("mop1"))),
 					"mop2" => saveMoney(clean_data(post("mop2"))),
 					"mop3" => saveMoney(clean_data(post("mop3"))),
@@ -240,6 +241,7 @@ class Tax_order_assessment extends CI_Controller {
                 $insertData = [
                   "basic" => $getData["total_basic"],
                   "sef" =>  $getData["total_basic"],
+                  "garbage_fee" =>$getData["garbageFee"],
                   "penalty" =>  $getData["total_penalty"],
                   "discount" =>  Floatval($getData["total_discount"]) *(-1),
                   "total" => $getData["total_fee"],
@@ -256,6 +258,7 @@ class Tax_order_assessment extends CI_Controller {
                 $insertData = [
                   "basic" => $getData["total_basic"],
                   "sef" =>  $getData["total_basic"],
+                  "garbage_fee" =>$getData["garbageFee"],
                   "penalty" =>  $getData["total_penalty"],
                   "discount" =>  Floatval($getData["total_discount"]) *(-1),
                   "total" => $getData["total_fee"],
@@ -324,7 +327,7 @@ class Tax_order_assessment extends CI_Controller {
 						$dueDateSemi = array("6/30/".$yearnow,"12/31/".$yearnow);
 						$startDateQuarterly = array("1/1/".$yearnow,"4/1/".$yearnow,"7/1/".$yearnow,"10/1/".$yearnow);
 						$dueDateQuarterly = array("3/31/".$yearnow,"6/30/".$yearnow,"9/30/".$yearnow,"12/31/".$yearnow);
-						$divPayment = array($basic1,$basic2,$basic3,$basic4);
+            $divPayment = array($basic1,$basic2,$basic3,$basic4);
 						$startDateCompromise = array("1/1/".$yearnow,"2/1/".$yearnow,"3/1/".$yearnow,"4/1/".$yearnow,"5/1/".$yearnow,"6/1/".$yearnow,"7/1/".$yearnow,"8/1/".$yearnow,"9/1/".$yearnow,"10/1/".$yearnow,"11/1/".$yearnow,"12/1/".$yearnow);
 						$dueDateCompromise = array("1/31/".$yearnow,"2/29/".$yearnow,"3/31/".$yearnow,"4/30/".$yearnow,"5/31/".$yearnow,"6/30/".$yearnow,"7/31/".$yearnow,"8/31/".$yearnow,"9/30/".$yearnow,"10/31/".$yearnow,"11/30/".$yearnow,"12/31/".$yearnow);
 						
@@ -334,11 +337,12 @@ class Tax_order_assessment extends CI_Controller {
 						{
 							case "Annually":
 								$insertData = [
-									"start_date" => "1/1/".$yearNow,
-									"due_date" => "3/31/".$yearNow,
+									"start_date" => "1/1/".$yearnow,
+									"due_date" => "3/31/".$yearnow,
 									"due_basic" => $getData["basic_fee"],
 									"due_sef" => $getData["basic_fee"],
-									"tax_year" => $yearnow,
+                  "tax_year" => $yearnow,
+      
 									"payment_no" => "1",
 									"tax_order_id" => $query,
 										];
@@ -352,7 +356,8 @@ class Tax_order_assessment extends CI_Controller {
 									"due_date" => $dueDateSemi[$i],
 									"due_basic" => $divPayment[$i]/2,
 									"due_sef" => $divPayment[$i]/2,
-									"tax_year" =>  $yearnow,
+                  "tax_year" =>  $yearnow,
+    
 									"payment_no" => $i+1,
 									"tax_order_id" => $query,
 								];
@@ -367,7 +372,8 @@ class Tax_order_assessment extends CI_Controller {
 									"due_date" => $dueDateQuarterly[$i],
 									"due_basic" =>  $divPayment[$i]/2,
 									"due_sef" => $divPayment[$i]/2,
-									"tax_year" =>  $yearnow,
+                  "tax_year" =>  $yearnow,
+
 									"payment_no" => $i+1,
 									"tax_order_id" => $query,
 								];
@@ -382,11 +388,11 @@ class Tax_order_assessment extends CI_Controller {
 								{
 
 									$insertData = [
-
 										"due_basic" => ($payment[$i] == NULL) ? Floatval($basic1)/2 : Floatval($payment[$i]) /2 ,
 										"due_sef" => ($payment[$i] == NULL) ? Floatval($basic1)/2 : Floatval($payment[$i]) /2 ,
 										"due_total" =>   ($payment[$i] == NULL) ? Floatval($basic1) : Floatval($payment[$i])  ,
-										"tax_year"  =>  $yearnow,
+                    "tax_year"  =>  $yearnow,
+  
 										"payment_no" => $i+1,
 										"tax_order_id" => $query,
 									];

@@ -61,7 +61,7 @@ $pdf->Text(190,30, date("m/d/Y"));
 
 
 $pdf->setCellPaddings(2, 4, 6, 8);
-$txt = ($payor_name == null ? "" : $payor_name);
+$txt = ($payor_name == null ? "asd" : $payor_name);
 $pdf->MultiCell(90, 41, $txt, 0, 'L', 1, 2, 55, 31, true);
 
 $pdf->setCellPaddings(2, 4, 6, 8);

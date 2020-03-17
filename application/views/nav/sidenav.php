@@ -61,6 +61,7 @@
 				<li>
 					<a href="<?php echo base_url()?>Clearance" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fas fa-file-alt "></i> Clearance</a>
 				</li>
+      
 				<!-- <li>
 					<a href="<?php echo base_url()?>Audit_trail" class="list-group-item list-group-item-action bg-light heavy-rain-gradient"><i class="fas fa-clipboard-list "></i> Audit Trail</a>
 				</li> -->

@@ -10,9 +10,7 @@ var check_date = [];
 
 var or_number;
 var or_date;
-var first_name;
-var middle_name;
-var last_name;
+var payor_name;
 var cash_rec;
 var total_rec;
 var due_total;
@@ -131,9 +129,7 @@ $("#payment_search_btn").click(function(e){
         or_date = $("#or_date").val();
         cash_rec = getcash;
         total_rec = parseFloat(moneyToNum(getcash)) + parseFloat(total_cheque) - parseFloat(moneyToNum(change));
-        first_name = $("#first_name").val();
-        middle_name = $("#middle_name").val();
-        last_name = $("#last_name").val();
+        payor_name = $("#payor_name").val();
         due_total = $('#due_total').val();
         balance = $("#balance").val();
         tax_year = $("#tax_year").val();
@@ -145,12 +141,12 @@ $("#payment_search_btn").click(function(e){
       switch(payment_method)
       {
         case "cash":
-            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,payor_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
      
         break;
 
         case "check":
-            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,payor_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
             $('#cash_payment').attr("hidden",true);
             for(var i = 0; i< add_line.length;i++)
             {
@@ -175,7 +171,7 @@ $("#payment_search_btn").click(function(e){
         break;
 
         case "cashandcheck":
-            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
+            paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,payor_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty);
                 for(var i = 0; i< add_line.length;i++)
             { 
                 $.ajax({
@@ -202,14 +198,14 @@ $("#payment_search_btn").click(function(e){
      
      
   });
-  function paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty)
+  function paymentX(payment_method,mode_of_payment,or_number,or_date,cash_rec,total_rec,due_total,payor_name,balance,payment_id,check_rec,tax_year,due_discount,due_penalty)
   {
         $("#payment_idd").val(payment_id);
         console.log(payment_method);
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Payment/payment_cash',
-        data: {payment_method:payment_method,mode_of_payment:mode_of_payment,due_penalty:due_penalty,due_discount:due_discount,tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,first_name:first_name,middle_name:middle_name,last_name:last_name},
+        data: {payment_method:payment_method,mode_of_payment:mode_of_payment,due_penalty:due_penalty,due_discount:due_discount,tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,payor_name:payor_name},
         dataType:"json",
         success : function(data){
             console.table(data);
@@ -236,11 +232,11 @@ $("#payment_search_btn").click(function(e){
 
   function view_OR(id)
   {
-      
+      var taxData = $("#taxData").val();
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Payment/view_OR',
-        data: {id:id},
+        data: {id:id,taxData:taxData},
         xhrFields: {	responseType: 'blob'},
         success : function(data){
             var url = window.URL.createObjectURL(data);
@@ -253,12 +249,12 @@ $("#payment_search_btn").click(function(e){
 
   function printOR()
   {
-    
+    var taxData = $("#taxData").val();
     var id = $("#payment_idd").val();
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Payment/print_OR',
-        data: {id:id},
+        data: {id:id,taxData:taxData},
         xhrFields: {	responseType: 'blob'},
         success : function(data){
 
@@ -297,9 +293,9 @@ $("#payment_search_btn").click(function(e){
        
     var id = val
     
-  
+    var taxData = $("#taxData").val();
     $("#viewPayment").modal("show");
-    paymentHistory(id,year);
+    paymentHistory(id,taxData);
     console.log(year);
    
   }
@@ -310,7 +306,7 @@ $("#payment_search_btn").click(function(e){
     paymentHistory(id);
   });
 
-  function paymentHistory(id)
+  function paymentHistory(id,taxData)
   {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
@@ -321,7 +317,7 @@ $("#payment_search_btn").click(function(e){
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Payment/payment_history',
-        data: {id:id},
+        data: {id:id,taxData:taxData},
         dataType:"json",
         success : function(data){
             //change paymenthistory_year to tax_year payment

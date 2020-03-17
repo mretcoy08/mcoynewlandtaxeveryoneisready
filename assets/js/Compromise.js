@@ -11,9 +11,7 @@ var check_date = [];
 
 var or_number;
 var or_date;
-var first_name;
-var middle_name;
-var last_name;
+var payor_name;
 var cash_rec;
 var total_rec;
 var due_total;
@@ -29,15 +27,18 @@ $(document).ready(function(){
 
 
 
-$(document).ready(function () {
+function compromise_table(search,searchType)
+{
+
+  $(document).ready(function () {
     dataTable = $('#posts').DataTable({
         "processing": true,
         "serverSide": true,
         "ajax":{
          "url": global.settings.url + "Compromise/compromise_table",
+         "data":{search:search,searchType:searchType},
          "dataType": "json",
          "type": "POST",
-         "data":{  '<?php echo $this->security->get_csrf_token_name(); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>' }
                        },
     "columns": [
               
@@ -53,6 +54,53 @@ $(document).ready(function () {
   });
 
 
+}
+
+$("#taxData").change(function(){
+  var data = $(this).val();
+  
+  if(data == "")
+  {
+      $("#compromise_search_btn").attr("disabled", true);
+      $("#compromise_search").attr("disabled", true);
+      var search = "asdqwezxc123";
+      $('#posts').DataTable().clear().destroy();
+      compromise_table(search,searchType);
+  }
+  else
+  {
+  
+    $("#compromise_search_btn").attr("disabled", false);
+      $("#compromise_search").attr("disabled", false);
+  }
+
+});
+
+$("#compromise_search_btn").click(function(e){
+  e.preventDefault();
+  var searchType = $("#taxData").val();
+  // var check = $("#assessment_search").val();
+  // $("#posts").dataTable().fnDestroy();
+  var search = $("#compromise_search").val();
+  //     console.log(search);
+  // if($.trim(search) == ''){
+  //     Swal.fire('You can\'t search with empty input field');
+     
+  // }
+  // else{
+      // $("#posts").dataTable().fnDestroy();
+      // $('#posts').DataTable().fnClearTable();
+    
+      $('#posts').DataTable().clear().destroy();
+      compromise_table(search,searchType);
+  // }
+  
+
+});
+
+
+
+
 
   function compromise(val)
   { 
@@ -61,12 +109,14 @@ $(document).ready(function () {
       $(".owners").remove();
       paymentHide(); 
         reset();
+        var taxData = $("#taxData").val();
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Compromise/compromise_payment',
-        data: {id:id},
+        data: {id:id,taxData:taxData},
         dataType:"json",
         success : function(data){
+       
             console.log(data);
             var landAndOwner = data.landAndOwner;
             var payment = data.payment;
@@ -124,9 +174,7 @@ $(document).ready(function () {
       or_date = $("#or_date").val();
       cash_rec = getcash;
       total_rec = parseFloat(moneyToNum(getcash)) + parseFloat(total_cheque) - parseFloat(moneyToNum(change));
-      first_name = $("#first_name").val();
-      middle_name = $("#middle_name").val();
-      last_name = $("#last_name").val();
+      payor_name = $("#payor_name").val();
       due_total = $('#due_total').val();
       balance = $("#balance").val();
       tax_year = $("#tax_year").val();
@@ -139,12 +187,12 @@ $(document).ready(function () {
     switch(payment_method)
     {
         case "cash":
-            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+            paymentX(or_number,or_date,cash_rec,total_rec,due_total,payor_name,balance,payment_id,check_rec,tax_year);
 
         break;
 
         case "check":
-            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+            paymentX(or_number,or_date,cash_rec,total_rec,due_total,payor_name,balance,payment_id,check_rec,tax_year);
             $('#cash_payment').attr("hidden",true);
             for(var i = 0; i< add_line.length;i++)
             {
@@ -166,7 +214,7 @@ $(document).ready(function () {
         break;
 
         case "cashandcheck":
-            paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year);
+            paymentX(or_number,or_date,cash_rec,total_rec,due_total,payor_name,balance,payment_id,check_rec,tax_year);
                 for(var i = 0; i< add_line.length;i++)
             { 
                 $.ajax({
@@ -214,9 +262,8 @@ $(document).ready(function () {
       or_date = $("#or_date").val();
       cash_rec = getcash;
       total_rec = parseFloat(moneyToNum(getcash)) + parseFloat(total_cheque) - parseFloat(moneyToNum(change));
-      first_name = $("#first_name").val();
-      middle_name = $("#middle_name").val();
-      last_name = $("#last_name").val();
+      payor_name = $("#payor_name").val();
+     
       due_total = $('#due_total').val();
       balance = $("#balance").val();
       tax_year = $("#tax_year").val();
@@ -237,13 +284,13 @@ $(document).ready(function () {
 
 
 
-function paymentX(or_number,or_date,cash_rec,total_rec,due_total,first_name,middle_name,last_name,balance,payment_id,check_rec,tax_year)
+function paymentX(or_number,or_date,cash_rec,total_rec,due_total,payor_name,balance,payment_id,check_rec,tax_year)
 {
     $("#payment_idd").val(payment_id);
   $.ajax({
       type : 'POST',
       url : global.settings.url + 'Compromise/compromise_cash',
-      data: {tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,first_name:first_name,middle_name:middle_name,last_name:last_name},
+      data: {tax_year:tax_year,check_rec:check_rec,payment_id:payment_id,balance:balance,or_number:or_number,or_date:or_date,cash_rec:cash_rec,total_rec:total_rec,due_total:due_total,payor_name:payor_name},
       dataType:"json",
       success : function(data){
           console.table(data);
@@ -271,11 +318,11 @@ $("#testbtn").click(function(){
 
 function view_OR(id)
   {
-      
+       var taxData = $("#taxData").val();
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Compromise/view_OR',
-        data: {id:id},
+        data: {id:id,taxData:taxData},
         xhrFields: {	responseType: 'blob'},
         success : function(data){
             var url = window.URL.createObjectURL(data);
@@ -288,12 +335,12 @@ function view_OR(id)
 
   function printOR()
   {
-    
+    var taxData = $("#taxData").val();
     var id = $("#payment_idd").val();
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Compromise/print_OR',
-        data: {id:id},
+        data: {id:id,taxData:taxData},
         xhrFields: {	responseType: 'blob'},
         success : function(data){
 
@@ -484,10 +531,11 @@ function compromise_history(id)
     var yyyy = today.getFullYear();
     var dateToday = yyyy+"-"+mm+"-"+dd;
     $(".phistory").val("");
+    var taxData = $("#taxData").val();
     $.ajax({
         type : 'POST',
         url : global.settings.url + 'Compromise/compromise_history',
-        data: {id:id},
+        data: {id:id,taxData:taxData},
         dataType:"json",
         success : function(data){
             //change paymenthistory_year to tax_year payment

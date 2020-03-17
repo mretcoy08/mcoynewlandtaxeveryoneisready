@@ -27,7 +27,36 @@
                         
                         </div>
                         <div class="card-body">
-                           
+                        <div class="row">
+                            <div class="col-md-3">
+                              <p>Tax order of Land and Building</p>
+                            </div>
+                            <div class="col-md-4">
+                            </div>
+                            <div class="col-md-5">
+                              <p>Search by: [PIN,NAME,TAX DECLARATION NO]</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                              <select name="taxData" id="taxData" class = "form-control">
+                                <option value="">Please Select...</option>
+                                <option value="Land">Land</option>
+                                <option value="Building">Building</option>
+                              </select>
+                            </div>
+                            <div class="col-md-4">
+                            </div>
+                            <div class="col-md-5">
+                              <div class="input-group">
+                                      <input type="text" class="form-control" id ="compromise_search" name = "compromise_search" disabled>
+                                      <span class="input-group-btn">
+                                          <button class="btn btn-primary btn-sm" type="button" id = "compromise_search_btn" disabled>Search!</button>
+                                      </span>
+                                  </div>
+                            </div>
+                          </div>
+
 
                         <!-- TABLE ROW -->
                         <div class="row">
@@ -157,26 +186,14 @@
 
         <div class="row" id = "name_of_payer">
 
-        <div class="col-sm-4">
+        <div class="col-sm-12">
                 <div class="form-group">
-                    <label class = "bmd-label-floating">First name:</label>
-                    <input type="text" class="form-control payment" name="first_name" id="first_name" >
+                    <label class = "bmd-label-floating">Payor's Name:</label>
+                    <input type="text" class="form-control payment" name="payor_name" id="payor_name" >
                 </div>  
             </div>
 
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label class = "bmd-label-floating">Middle name:</label>
-                    <input type="text" class="form-control payment" name="middle_name" id="middle_name" >
-                </div>  
-            </div>
-
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label class = "bmd-label-floating">Last name:</label>
-                    <input type="text" class="form-control payment" name="last_name" id="last_name" >
-                </div>  
-            </div>
+            
 
             <input type="hidden" id = "payment_id" name = "payment_id">
         
@@ -194,12 +211,12 @@
                 </div>  
             </div>
 
-            <div class="col-sm-6">
+            <!-- <div class="col-sm-6">
                 <div class="form-group">
                     <label class = "bmd-label-floating">Date:</label>
                     <input type="date" class="form-control payment" name="or_date" id="or_date" >
                 </div>  
-            </div>
+            </div> -->
 
             <div class="col-sm-4">
                 <div class="form-group">

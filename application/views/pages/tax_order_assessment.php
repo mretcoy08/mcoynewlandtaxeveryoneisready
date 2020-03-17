@@ -94,12 +94,7 @@
                         <div class="card-body">
 
                         <div class="row">
-                          <div class="col-md-6">
-                            <div class="form-group">
-                              <label for="">Requestor's Name:</label>
-                              <input type="text" class = "form-control payment" id = "requestor"  name = "requestor" required>
-                            </div>
-                          </div>
+                          
                         </div>
                             <div class="row">
                                 <div class="col-sm-3">
@@ -191,7 +186,7 @@
                                         <input type="text" class="form-control payment" name="status_of_tax" id="status_of_tax" readonly>
                                     </div>  
 
-                                    <input type="text" name = "idd" id = "idd">
+                                    <input type="hidden" name = "idd" id = "idd">
 
                                    
                                 </div>
@@ -249,15 +244,19 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="">Basic Fee:</label>
-                                                <input type="text" class ="form-control" id = "basic_fee" name = "basic_fee">
+                                                <input type="text" class ="form-control" id = "basic_fee" name = "basic_fee" readonly>
                                             </div>
                                             <div class="form-group">
                                                 <label for="">S.E.F:</label>
-                                                <input type="text" class ="form-control" id = "special_education_fee" name = "special_education_fee">
+                                                <input type="text" class ="form-control" id = "special_education_fee" name = "special_education_fee" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="">Garbage Fee:</label>
+                                                <input type="text" class ="form-control" id = "garbage_fee" name = "garbage_fee" readonly>
                                             </div>
                                             <div class="form-group">
                                                 <label for="">Total Fee:</label>
-                                                <input type="text" class ="form-control" id = "total_fee" name = "total_fee">
+                                                <input type="text" class ="form-control" id = "total_fee" name = "total_fee" readonly>
                                             </div>
 
 

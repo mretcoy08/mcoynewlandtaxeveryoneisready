@@ -92,11 +92,11 @@ $txt = ($lot_no == null ? "" : $lot_no);
 $pdf->MultiCell(25, 20, $txt, 0, 'L', 1, 2, 56, 57, true);
 
 $pdf->setCellPaddings(2, 4, 6, 8);
-$txt = ($tax_dec_no == null ? "88-12345" : $tax_dec_no);
+$txt = ($tax_dec_no == null ? "" : $tax_dec_no);
 $pdf->MultiCell(30, 20, $txt, 0, 'L', 1, 2, 72, 57, true);
 
 $pdf->setCellPaddings(2, 4, 6, 8);
-$txt = ($av_land == null ? "88-12345" : $av_land);
+$txt = ($av_land == null ? "" : $av_land);
 $pdf->MultiCell(30, 20, $txt, 0, 'L', 1, 2, 91, 57, true);
 
 $pdf->setCellPaddings(2, 4, 6, 8);
@@ -104,26 +104,26 @@ $txt = ($av_improvement == null ? "" : $av_improvement);
 $pdf->MultiCell(30, 20, $txt, 0, 'L', 1, 2, 106, 57, true);
 
 $pdf->setCellPaddings(2, 4, 6, 8);
-$txt = ($av_total == null ? "88-12345" : $av_total);
+$txt = ($av_total == null ? "" : $av_total);
 $pdf->MultiCell(40, 40, $txt, 0, 'L', 1, 2, 122, 57, true);
 
 $pdf->setCellPaddings(2, 4, 6, 8);
-$txt = ($tax_due == null ? "asdasd" : $tax_due);
+$txt = ($tax_due == null ? "" : $tax_due);
 $pdf->MultiCell(40, 40, $txt, 0, 'L', 1, 2, 140, 57, true);
 
 if($mode_of_payment != "Annually")
 {
   $pdf->setCellPaddings(2, 4, 6, 8);
-  $txt = ($ipayment_no == null ? "5" : $ipayment_no);
+  $txt = ($ipayment_no == null ? "" : $ipayment_no);
   $pdf->MultiCell(40, 40, $txt, 0, 'L', 1, 2, 160, 57, true);
 
   $pdf->setCellPaddings(2, 4, 6, 8);
-  $txt = ($ipayment == null ? "88-12345" : $ipayment);
+  $txt = ($ipayment == null ? "" : $ipayment);
   $pdf->MultiCell(40, 40, $txt, 0, 'L', 1, 2, 168, 57, true);
 }
 else{
   $pdf->setCellPaddings(2, 4, 6, 8);
-  $txt = ($full_payment == null ? "asd" : $full_payment);
+  $txt = ($full_payment == null ? "" : $full_payment);
   $pdf->MultiCell(40, 40, $txt, 0, 'L', 1, 2, 189, 57, true);
 }
 

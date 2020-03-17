@@ -321,7 +321,7 @@ class Main_model extends CI_Model{
 
 	public function getCompromiseInfo($where)
 	{
-		$query = $this->db->select("compromise.id as id,mode_of_payment,due_basic,due_sef,due_total,tax_year,payment_no,balance,tax_order.land_id")
+		$query = $this->db->select("compromise.id as id,mode_of_payment,due_basic,due_sef,due_total,tax_year,payment_no,balance,tax_order.land_id, tax_order.building_id")
 							->from("compromise")
 							->join("tax_order", "tax_order.id = compromise.tax_order_id", "inner")
 							->where("compromise.id",$where)
@@ -330,43 +330,63 @@ class Main_model extends CI_Model{
 		return $query->result();
 	}
 
-	public function getPin($where)
-	{
-		$query = $this->db->select("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)  as pin")
-							->from("tax_order")
-							->join("land", "land.id = tax_order.land_id", "inner")
-							->where($where)
-							->get();
-		return $query;
-	}
-
-	public function getPaymentHistory($pin,$where)
+	
+	public function getPaymentHistoryLand($land_id,$where)
 	{
 		$query = $this->db->select("payor_name, or_number, or_date, due_date, due_basic, due_sef, due_penalty, due_discount, due_total, tax_year, total_rec, payment_no, payment.payment_status,cash_rec,check_rec,total_rec")
 							->from("land")
 							->join("tax_order","tax_order.land_id = land.id", "inner")
 							->join("payment", "payment.tax_order_id = tax_order.id", "inner")
 							->join("or_pool", "or_pool.id = payment.or_pool_id", "inner")
-							->where("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)",$pin)
+							->where("land.id",$land_id)
+							->where($where)
+							->order_by("payment.id", "DESC")
+							->get();
+		return $query;
+  }
+  
+  public function getPaymentHistoryBuilding($building_id,$where)
+	{
+		$query = $this->db->select("payor_name, or_number, or_date, due_date, due_basic, due_sef, due_penalty, due_discount, due_total, tax_year, total_rec, payment_no, payment.payment_status,cash_rec,check_rec,total_rec")
+							->from("building")
+							->join("tax_order","tax_order.building_id = building.id", "inner")
+							->join("payment", "payment.tax_order_id = tax_order.id", "inner")
+							->join("or_pool", "or_pool.id = payment.or_pool_id", "inner")
+							->where("building.id",$building_id)
 							->where($where)
 							->order_by("payment.id", "DESC")
 							->get();
 		return $query;
 	}
 
-	public function getCompromiseHistory($pin,$where)
+	public function getCompromiseHistoryLand($land_id,$where)
 	{
 		$query = $this->db->select("payor_name, or_number, or_date, due_basic, due_sef, due_total, tax_year, total_rec, payment_no, compromise.payment_status,cash_rec,check_rec,total_rec")
-							->from("land")
-							->join("tax_order","tax_order.land_id = land.id", "inner")
-							->join("compromise", "compromise.tax_order_id = tax_order.id", "inner")
-							->join("or_pool", "or_pool.id = compromise.or_pool_id", "inner")
-							->where("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)",$pin)
-							->where($where)
-							->order_by("compromise.id", "DESC")
+              ->from("land")
+              ->join("tax_order","tax_order.land_id = land.id", "inner")
+              ->join("compromise", "compromise.tax_order_id = tax_order.id", "inner")
+              ->join("or_pool", "or_pool.id = compromise.or_pool_id", "inner")
+              ->where("land.id",$land_id)
+              ->where($where)
+              ->order_by("compromise.id", "DESC")
+							->get();
+		return $query;
+  }
+  
+  public function getCompromiseHistoryBuilding($building_id,$where)
+	{
+		$query = $this->db->select("payor_name, or_number, or_date, due_basic, due_sef, due_total, tax_year, total_rec, payment_no, compromise.payment_status,cash_rec,check_rec,total_rec")
+              ->from("building")
+              ->join("tax_order","tax_order.building_id = building.id", "inner")
+              ->join("compromise", "compromise.tax_order_id = tax_order.id", "inner")
+              ->join("or_pool", "or_pool.id = compromise.or_pool_id", "inner")
+              ->where("building.id",$building_id)
+              ->where($where)
+              ->order_by("compromise.id", "DESC")
 							->get();
 		return $query;
 	}
+
 
 	public function selecttax($where)
 	{
@@ -392,24 +412,47 @@ class Main_model extends CI_Model{
 	// 	return $query;
 	// }
 
-	public function getTaxOrder($pin)
+	public function getTaxOrderLand($land_id)
 	{
 		$query = $this->db->select("basic, sef, penalty, discount, total, balance, mode_of_payment,year_assessed,tax_year_start, tax_year_end")
 							->from("land")
 							->join("tax_order","tax_order.land_id = land.id", "inner")
-							->where("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)",$pin)
+							->where("land.id",$land_id)
+							->order_by("tax_order.id", "DESC")
+							->limit(1)
+							->get();
+		return $query;
+  }
+  
+  public function getTaxOrderBuilding($building_id)
+	{
+		$query = $this->db->select("basic, sef, penalty, discount, total, balance, mode_of_payment,year_assessed,tax_year_start, tax_year_end")
+							->from("building")
+							->join("tax_order","tax_order.building_id = building.id", "inner")
+							->where("building.id",$building_id)
 							->order_by("tax_order.id", "DESC")
 							->limit(1)
 							->get();
 		return $query;
 	}
 
-	public function getLandAndOwner($pin)
+	public function getLandAndOwner($land_id)
 	{
 		$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)  as pin, tax_dec_no, barangay, assessed_value, class, land_status")
 							->from("land")
 							->join("land_owner", "land.id = land_owner.land_id", "inner")
-							->where("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)",$pin)
+							->where("land.id",$land_id)
+							->get();
+		return $query;
+  }
+  
+  public function getBuildingAndOwner($building_id)
+	{
+		$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,'-',building_pin)  as pin, building.tax_dec_no, barangay, building.assessed_value, class, building_status")
+							->from("building")
+              ->join("building_owner", "building.id = building_owner.building_id", "inner")
+              ->join("land", "land.id = building.land_id", "inner")
+							->where("building.id",$building_id)
 							->get();
 		return $query;
 	}
@@ -456,6 +499,20 @@ class Main_model extends CI_Model{
 						->where($where)
 						->get();
 		return $query;
+  }
+  
+  public function getOrPaymentBuilding($where)
+	{
+		$query = $this->db->select("payor_name, barangay, building.tax_dec_no, basic, penalty, total, or_date, mode_of_payment, due_basic, payment_no, due_penalty, due_date, due_total, CONCAT(first_name,' ',middle_name,' ',last_name) as ofull_name")
+						->from("payment")
+						->join("or_pool", "or_pool.id = payment.or_pool_id", "inner")
+						->join("tax_order", "tax_order.id = payment.tax_order_id", "inner")
+						->join("building", "building.id = tax_order.building_id", "inner")
+            ->join("land", "land.id = building.land_id", "inner")
+						->join("building_owner", "building_owner.building_id = building.id", "inner")
+						->where($where)
+						->get();
+		return $query;
 	}
 
 	public function getOrCompromise($where)
@@ -466,6 +523,20 @@ class Main_model extends CI_Model{
 						->join("tax_order", "tax_order.id = compromise.tax_order_id", "inner")
 						->join("land", "land.id = tax_order.land_id", "inner")
 						->join("land_owner lo", "lo.land_id = land.id", "inner")
+						->where($where)
+						->get();
+		return $query;
+  }
+  
+  public function getOrCompromiseBuilding($where)
+	{
+		$query = $this->db->select("payor_name, barangay, building.tax_dec_no, basic, penalty, total, or_date, mode_of_payment, due_basic, payment_no, due_total, CONCAT(first_name,' ',middle_name,' ',last_name) as ofull_name")
+						->from("compromise")
+						->join("or_pool", "or_pool.id = compromise.or_pool_id", "inner")
+            ->join("tax_order", "tax_order.id = compromise.tax_order_id", "inner")
+            ->join("building", "building.id = tax_order.building_id", "inner")
+            ->join("land", "land.id = building.land_id", "inner")
+						->join("building_owner", "building_owner.building_id = building.id", "inner")
 						->where($where)
 						->get();
 		return $query;
@@ -862,7 +933,7 @@ function all_post_count($table,$data,$where)
 			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,'-',building_pin) as pin, barangay, tax_order.id, building.tax_dec_no,payment_status, mode_of_payment, year_assessed, year_of_effectivity")
 							->from("tax_order")
               ->join("building","tax_order.building_id = building.id","inner")
-              ->join("building_owner","building_owner.building_id = building_owner.id","inner")
+              ->join("building_owner","building_owner.building_id = building.id","inner")
               ->join("land","building.land_id = land.id","inner")
               ->where("mode_of_payment !=", "Compromise")
               ->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,'-',building_pin,'-',building.tax_dec_no)",$search)
@@ -925,28 +996,70 @@ function all_post_count($table,$data,$where)
 		//END OF PAYMENT TABLE
 
 		// COMPROMISE TABLE
-		function all_post_compromise_count()
+		function all_post_compromise_land_count($search)
 		{  
 			$yearDate = date("Y");
 			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, tax_dec_no, payment_status, mode_of_payment, year_assessed, year_of_effectivity")
 							->from("tax_order")
 							->join("land","tax_order.land_id = land.id","inner")
 							->join("land_owner","land_owner.land_id = land.id","inner")
-							->where("mode_of_payment", "Compromise")
+              ->where("mode_of_payment", "Compromise")
+              ->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',tax_dec_no)",$search)
 							->get();
 
 			return $query->num_rows();  
 
 		}
 
-		function all_post_compromise($limit,$start,$col,$dir)
+		function all_post_compromise_land($limit,$start,$col,$dir,$search)
 		{   
 			$yearDate = date("Y");
 			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, tax_dec_no,payment_status, mode_of_payment, year_assessed, year_of_effectivity")
 							->from("tax_order")
 							->join("land","tax_order.land_id = land.id","inner")
 							->join("land_owner","land_owner.land_id = land.id","inner")
-							->where("mode_of_payment", "Compromise")
+              ->where("mode_of_payment", "Compromise")
+              ->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',tax_dec_no)",$search)
+							->order_by("tax_order.id", "DESC")
+							->get();	
+			
+			if($query->num_rows()>0)
+			{
+				return $query->result(); 
+			}
+			else
+			{
+				return null;
+			}
+			
+    }
+    
+    function all_post_compromise_building_count($search)
+		{  
+			$yearDate = date("Y");
+			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, building.tax_dec_no, payment_status, mode_of_payment, year_assessed, year_of_effectivity")
+							->from("tax_order")
+              ->join("building","tax_order.building_id = building.id","inner")
+              ->join("building_owner","building_owner.building_id = building.id","inner")
+              ->join("land", "land.id = building.land_id", "inner")
+              ->where("mode_of_payment", "Compromise")
+              ->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',building.tax_dec_no)",$search)
+							->get();
+
+			return $query->num_rows();  
+
+		}
+
+		function all_post_compromise_building($limit,$start,$col,$dir,$search)
+		{   
+			$yearDate = date("Y");
+			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, building.tax_dec_no,payment_status, mode_of_payment, year_assessed, year_of_effectivity")
+							->from("tax_order")
+							->join("building","tax_order.building_id = building.id","inner")
+              ->join("building_owner","building_owner.building_id = building.id","inner")
+              ->join("land", "land.id = building.land_id", "inner")
+              ->where("mode_of_payment", "Compromise")
+              ->like("CONCAT(first_name,' ',middle_name,' ',last_name,' ',pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel,' ',building.tax_dec_no)",$search)
 							->order_by("tax_order.id", "DESC")
 							->get();	
 			
@@ -961,48 +1074,48 @@ function all_post_count($table,$data,$where)
 			
 		}
 
-		function all_post_compromise_search($limit,$start,$search,$col,$dir)
-		{
+		// function all_post_compromise_search($limit,$start,$search,$col,$dir)
+		// {
 
-			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, tax_dec_no,payment_status, mode_of_payment, year_assessed, year_of_effectivity")
-							->from("land")
-							->join("land_owner","land_owner.land_id = land.id","inner")
-							->join("tax_order","tax_order.land_id = land.id","inner")
-							->like("CONCAT(first_name,' ',middle_name,' ',last_name)", $search)
-							->or_like("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)", $search)
-							->or_like("tax_dec_no", $search)
-							->or_like("barangay", $search)
-							->order_by("tax_order.id", "DESC")
-							->where("mode_of_payment", "Compromise")
-							->get();	
+		// 	$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, tax_dec_no,payment_status, mode_of_payment, year_assessed, year_of_effectivity")
+		// 					->from("land")
+		// 					->join("land_owner","land_owner.land_id = land.id","inner")
+		// 					->join("tax_order","tax_order.land_id = land.id","inner")
+		// 					->like("CONCAT(first_name,' ',middle_name,' ',last_name)", $search)
+		// 					->or_like("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)", $search)
+		// 					->or_like("tax_dec_no", $search)
+		// 					->or_like("barangay", $search)
+		// 					->order_by("tax_order.id", "DESC")
+		// 					->where("mode_of_payment", "Compromise")
+		// 					->get();	
 		
-			if($query->num_rows()>0)
-			{
-				return $query->result();  
-			}
-			else
-			{
-				return null;
-			}
-		}
+		// 	if($query->num_rows()>0)
+		// 	{
+		// 		return $query->result();  
+		// 	}
+		// 	else
+		// 	{
+		// 		return null;
+		// 	}
+		// }
 
-		function all_post_compromise_search_count($search)
-		{	
-			$yearDate = date("Y");
-			$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, tax_dec_no,payment_status, mode_of_payment, year_assessed, year_of_effectivity")
-							->from("land")
-							->join("land_owner","land_owner.land_id = land.id","inner")
-							->join("tax_order","tax_order.land_id = land.id","inner")
-							->like("CONCAT(first_name,' ',middle_name,' ',last_name)", $search)
-							->or_like("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)", $search)
-							->or_like("tax_dec_no", $search)
-							->or_like("barangay", $search)
-							->order_by("tax_order.id", "DESC")
-							->where("mode_of_payment", "Compromise")
-							->get();	
+		// function all_post_compromise_search_count($search)
+		// {	
+		// 	$yearDate = date("Y");
+		// 	$query = $this->db->select("CONCAT(first_name,' ',middle_name,' ',last_name) as full_name, CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel) as pin, barangay, tax_order.id, tax_dec_no,payment_status, mode_of_payment, year_assessed, year_of_effectivity")
+		// 					->from("land")
+		// 					->join("land_owner","land_owner.land_id = land.id","inner")
+		// 					->join("tax_order","tax_order.land_id = land.id","inner")
+		// 					->like("CONCAT(first_name,' ',middle_name,' ',last_name)", $search)
+		// 					->or_like("CONCAT(pin_city,'-',pin_district,'-',pin_barangay,'-',pin_section,'-',pin_parcel)", $search)
+		// 					->or_like("tax_dec_no", $search)
+		// 					->or_like("barangay", $search)
+		// 					->order_by("tax_order.id", "DESC")
+		// 					->where("mode_of_payment", "Compromise")
+		// 					->get();	
 
-			return $query->num_rows();
-		}
+		// 	return $query->num_rows();
+		// }
 		//END OF COMPROMISE TABLE
 
 		

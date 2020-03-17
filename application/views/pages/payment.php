@@ -179,24 +179,10 @@
 
         <div class="row" id = "name_of_payer">
 
-        <div class="col-sm-4">
+        <div class="col-sm-12">
                 <div class="form-group">
-                    <label class = "bmd-label-floating">First name:</label>
-                    <input type="text" class="form-control payment" name="first_name" id="first_name" >
-                </div>  
-            </div>
-
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label class = "bmd-label-floating">Middle name:</label>
-                    <input type="text" class="form-control payment" name="middle_name" id="middle_name" >
-                </div>  
-            </div>
-
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label class = "bmd-label-floating">Last name:</label>
-                    <input type="text" class="form-control payment" name="last_name" id="last_name" >
+                    <label class = "bmd-label-floating">Payor's Fullname:</label>
+                    <input type="text" class="form-control payment" name="payor_name" id="payor_name" >
                 </div>  
             </div>
 
@@ -217,10 +203,7 @@
             </div>
 
             <div class="col-sm-6">
-                <div class="form-group">
-                    <label class = "bmd-label-floating">Date:</label>
-                    <input type="date" class="form-control payment" name="or_date" id="or_date" >
-                </div>  
+                
             </div>
 
             <div class="col-sm-4">
